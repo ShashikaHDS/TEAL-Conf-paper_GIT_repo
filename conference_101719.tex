@@ -6,6 +6,8 @@
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{booktabs}
@@ -82,14 +84,7 @@ The construction sector has long been one of the least automated of the major in
 
 Reconfigurable and modular platforms tackle constrained spaces by changing their own geometry, splitting or folding so the robot can pass through gaps a fixed body could not~\cite{CONCERT,9817632, prabakaran2017htetro}, although this adds mechanical joints and control complexity. Newer navigation stacks add learned perception, multi-sensor fusion, and online path planners that replan around obstacles as they appear. These methods make a robot move through a site more reliably, but they demand heavy sensing and computation, and they operate only after the robot is already on site. What these responses have in common is that they act on the robot or on its perception rather than on the site itself.
 
-The idea of robot inclusivity, meaning the extent to which an environment admits a given robot, has been raised in earlier work~\cite{robot_inclusivity_2013,buildings14051193}. The methods proposed so far are largely manual, in which a person walks the site and judges suitability by eye, and such assessment neither scales across many floors and fleets of different robots nor forecasts the effect of a proposed change. Closer to an automated measure, an inclusivity-style index has been proposed for illumination conditions~\cite{zeng2024riilux}, and a companion 
-
-
-
-
-
-
-index scores floor surface unevenness~\cite{borusu2024rilsu}, yet neither produces an accessibility score that accounts for the obstructions that most often stop a mobile robot, namely narrow passages, slopes, steps, and limited overhead clearance, and neither returns concrete changes that would improve the site. Automated pipelines built on building information models can turn a known model into a robot-specific grid and estimate coverage for one platform~\cite{chen2024bimcpp}, yet they presume a curated model rather than a single raw scan of a live construction site. More broadly, robotics offers mature methods for covering a region that is already known to be navigable~\cite{gabriely2001spanning,choset1998boustrophedon,galceran2013survey} and for exploring unknown space online~\cite{yamauchi1997frontier,zelinsky1993planning}, but no existing method computes, in advance of deployment, how much of a specific site a specific robot can reach, nor identifies the site changes that would increase that reach.
+The idea of robot inclusivity, meaning the extent to which an environment admits a given robot, has been raised in earlier work~\cite{robot_inclusivity_2013,buildings14051193}. The methods proposed so far are largely manual, in which a person walks the site and judges suitability by eye, and such assessment neither scales across many floors and fleets of different robots nor forecasts the effect of a proposed change. Closer to an automated measure, an inclusivity-style index has been proposed for illumination conditions~\cite{zeng2024riilux}, and a companion index scores floor surface unevenness~\cite{borusu2024rilsu}, yet neither produces an accessibility score that accounts for the obstructions that most often stop a mobile robot, namely narrow passages, slopes, steps, and limited overhead clearance, and neither returns concrete changes that would improve the site. Automated pipelines built on building information models can turn a known model into a robot-specific grid and estimate coverage for one platform~\cite{chen2024bimcpp}, yet they presume a curated model rather than a single raw scan of a live construction site. More broadly, robotics offers mature methods for covering a region that is already known to be navigable~\cite{gabriely2001spanning,choset1998boustrophedon,galceran2013survey} and for exploring unknown space online~\cite{yamauchi1997frontier,zelinsky1993planning}, but no existing method computes, in advance of deployment, how much of a specific site a specific robot can reach, nor identifies the site changes that would increase that reach.
 
 We introduce the Robot Inclusivity Index (RII), a closed-loop framework that works from a single three-dimensional point-cloud walkthrough of a site. From that one scan the framework quantifies how much of the site a specified robot can reach, it visualises the reachable and unreachable regions as an accessibility map, and it produces a ranked list of physical changes such as relocating stored objects, widening corridors, or adjusting ramps, with each change carrying a predicted gain in reachable area that can then be verified on site. Because the traversable map is generated for each robot from the same scan, a single site visit can screen an entire fleet in advance. The contributions of this paper are fourfold. First, we formulate a traversable-map representation that is aware of the target robot and fuses slab projection with slope and step tolerances. Second, we introduce a reference-footprint protocol that separates the unreachability imposed by the environment from that imposed by the platform. Third, we develop a human-guided relocation mechanism that recomputes the index live as an operator moves candidate obstacles and reports the as-found and optimised scores side by side. Fourth, we validate the framework through a field study at an active construction site. The rest of the paper is organised as follows. Section~\ref{sec:overview} gives a system overview, Section~\ref{sec:method} develops the robot inclusivity index and its computation, Section~\ref{sec:results} reports the field study, and Section~\ref{sec:conclusion} concludes.
 
@@ -99,10 +94,31 @@ We introduce the Robot Inclusivity Index (RII), a closed-loop framework that wor
  
 \begin{figure}[t]
 \centering
-% TODO replace placeholder with the pipeline overview figure showing inputs,
-% methods, outputs, the audit robot, and the target robot
-\framebox[\linewidth]{\rule{0pt}{4.5cm}\parbox{0.9\linewidth}{\centering Pipeline overview figure placeholder. Inputs (3D map from audit robot, target-robot parameters), methods (traversable-map generation, RII analysis), outputs (traversable map, accessibility map, RII score).}}
-\caption{Overview of the RII calculation pipeline. An audit robot captures a 3D map of the site, and the RII algorithm combines the map with the physical parameters of a target robot to produce a traversable map, an accessibility map, and the Robot Inclusivity Index.}
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, rounded corners=1.5pt, align=center, inner sep=3.5pt},
+  io/.style={box, fill=black!8},
+  out/.style={box, fill=black!16},
+  arr/.style={-{Stealth[length=2.2mm]}, semithick}
+]
+\node[io] (scan) {3D point-cloud scan\\(audit robot, one walkthrough)};
+\node[io, right=3.5mm of scan] (params) {Target robot\\parameters};
+\node[box, below=5mm of $(scan.south)!0.5!(params.south)$] (trav) {Robot-specific traversable map};
+\node[box, below=3mm of trav] (acc) {Connected-reachability analysis};
+\node[out, below=3mm of acc] (rii) {RII score and accessibility map};
+\node[box, below=3mm of rii] (diag) {Barrier diagnosis and\\improvement ranking};
+\node[box, below=3mm of diag] (reloc) {Human-guided relocation plan};
+\node[box, below=3mm of reloc] (site) {Physical site changes};
+\draw[arr] (scan.south) -- ([xshift=-10mm]trav.north);
+\draw[arr] (params.south) -- ([xshift=10mm]trav.north);
+\draw[arr] (trav) -- (acc);
+\draw[arr] (acc) -- (rii);
+\draw[arr] (rii) -- (diag);
+\draw[arr] (diag) -- (reloc);
+\draw[arr] (reloc) -- (site);
+\draw[arr] (site.west) -- ++(-5mm,0) |- node[pos=0.3, sloped, above, font=\scriptsize]{verification rescan} (scan.west);
+\end{tikzpicture}
+\caption{Overview of the closed-loop RII pipeline. An audit robot captures the site once as a 3D point cloud; combined with the physical parameters of a target robot, the framework produces a robot-specific traversable map, the Robot Inclusivity Index with its accessibility map, and a ranked relocation plan, and a repeat scan after the physical changes verifies the realised gain.}
 \label{fig:pipeline}
 \end{figure}
  
@@ -172,14 +188,19 @@ We evaluate the framework at an active construction site and organise the experi
 
 \subsection{Experimental Setup}
 \label{sec:setup}
-We validated the framework at the New Science Centre construction site in Singapore, an active project whose cluttered and changing conditions match the environments the method targets. Nine environment settings were selected across the site, and each setting stages one or more of the validation test cases of Section~\ref{sec:testcases}. Table~\ref{tab:settings} lists the staged cases and the conditions in which each was set up, following the two-condition design of the protocol.
+We validated the framework at the New Science Centre construction site in Singapore, an active project whose cluttered and changing conditions match the environments the method targets. Nine environment settings were selected across the site, and each setting stages one or more of the validation test cases of Section~\ref{sec:testcases}.
+% TODO confirm the setting count, the project report describes five settings;
+% nine holds only if the four relocation tests count as separate settings Table~\ref{tab:settings} lists the staged cases and the conditions in which each was set up, following the two-condition design of the protocol.
 % NOTE wall reachability (TC-09) and stair climbing (TC-10) from the wider
 % catalogue are outside this paper's scope and are omitted from the table
  
-For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction ground that carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing running on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
+For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction ground that % TODO confirm the LiDAR model, the project report states an Ouster OS0-128
+carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing running on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
  
-We assessed three target robots chosen for their deliberately different forms, a quadruped (Unitree GO2), an omnidirectional transport robot (Movilo), and a painting robot (BES FT-P320). % TODO confirm the omnidirectional platform name, the slides call it Movilo
-For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility heat map for that robot in that setting. Assessing three platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine.
+We assessed two target robots chosen for their deliberately different forms, an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2).
+% NOTE the BES FT-P320 painting robot was scanned for but its assessment is
+% not yet complete; reinstate it here and in Table II once its data is final
+For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility heat map for that robot in that setting. Assessing two platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine.
  
 \begin{table}[t]
 \caption{Validation test cases and their staged conditions.}
@@ -195,13 +216,13 @@ No & Test item & Staged conditions \\
 \midrule
 01 & Corridor width & Width above and at or below the robot width \\
 02 & Corridor height & Clearance above and at or below the robot height \\
-02 & Floor obstacles & Safety items, partitions, stacked and large materials, containers, scaffolding, rebars, cables, hoses, humans, and consumables, each placed at the edge of the route and then blocking it \\
-03 & Step & Step height within and beyond the climbing tolerance \\
-04 & Ramp & Ramp angle below and above the maximum climbing angle \\
-05 & Bump & Bump height below, near, and above the ground clearance \\
-06 & Narrow gap & Gap width above and at or below the wheel width \\
-07 & Overhead clearance & Clearance above and at or below the robot height \\
-08 & Turning space & Available space above and below the turning requirement \\
+03 & Floor obstacles & Safety items, partitions, stacked and large materials, containers, scaffolding, rebars, cables, hoses, humans, and consumables, each placed at the edge of the route and then blocking it \\
+04 & Step & Step height within and beyond the climbing tolerance \\
+05 & Ramp & Ramp angle below and above the maximum climbing angle \\
+06 & Bump & Bump height below, near, and above the ground clearance \\
+07 & Narrow gap & Gap width above and at or below the wheel width \\
+08 & Overhead clearance & Clearance above and at or below the robot height \\
+09 & Turning space & Available space above and below the turning requirement \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -210,16 +231,18 @@ No & Test item & Staged conditions \\
 \caption{Physical and mobility parameters of the target robots.}
 \label{tab:robots}
 \centering
-% TODO fill height, step and slope tolerances, and the FT-P320 dimensions
-\begin{tabular}{lccc}
+% TODO fill the GO2 height, step and slope tolerances, and the Movilo slope
+% tolerance; Movilo values from the project report (height loaded with goods)
+\begin{tabular}{lcc}
 \toprule
-Parameter & GO2 & Movilo & FT-P320 \\
+Parameter & Movilo & GO2 \\
 \midrule
-Length (L) & 0.70\,m & 0.98\,m & x\\
-Width (W) & 0.40\,m & 0.95\,m & x\\
-Height (H) &x &x & x\\
-Maximum climbable step ($S_{\max}$) &x &x & x\\
-Maximum climbable slope ($\theta_{\max}$) &x &x & x\\
+Length (L) & 0.98\,m & 0.70\,m \\
+Width (W) & 0.95\,m & 0.40\,m \\
+Height (H) & 0.50\,m & x \\
+Maximum climbable step ($s_{\max}$) & 0.045\,m & x \\
+Maximum climbable slope ($\theta_{\max}$) & x & x \\
+Drive type ($d$) & Omnidirectional & Legged \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -302,11 +325,11 @@ Overall & & 92.4\% & 98.6\% & 97.7\% \\
 \end{tabular}
 \end{table}
 
-The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the indices separated the three platforms in the order their capabilities predict. % TODO confirm these qualitative observations against the final annotation set
+The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the indices separated the two platforms in the order their capabilities predict. % TODO confirm these qualitative observations against the final annotation set
 
 \subsection{Closed-Loop Site Improvement}
 \label{sec:loop}
-The closed loop of Section~\ref{sec:relocation} was exercised in four of the settings. In each test the framework computed the as-found index, the barrier diagnosis proposed the relocation of blocking obstacles, an operator refined and confirmed the plan in the interface, the site team applied the changes physically, and the audit robot rescanned the area for a second assessment. Table~\ref{tab:relocation} reports, for each test, the as-found index, the index predicted after the planned relocation, and the index measured from the repeat scan, and Fig.~\ref{fig:beforeafter} shows a representative pair of heat maps before and after the change.
+The closed loop of Section~\ref{sec:relocation} was exercised in four of the settings. In each test the framework computed the as-found index, the barrier diagnosis proposed the relocation of blocking obstacles, an operator refined and confirmed the plan in the interface, the site team applied the changes physically, and the audit robot rescanned the area for a second assessment. Table~\ref{tab:relocation} reports, for each test, the as-found index, the index predicted after the planned relocation, and the index measured from the repeat scan.
 % TODO fill tab:relocation from the four before and after tests
 \textit{[Sentence to be added, the measured gains tracked the predicted gains within X percentage points across the four tests.]}
  
@@ -328,13 +351,14 @@ R4 & & & & \\
 \end{tabular}
 \end{table}
  
-\begin{figure}[!t]
-\centering
-% TODO replace placeholder with a representative before and after pair
-\framebox[\linewidth]{\rule{0pt}{3.2cm}\parbox{0.9\linewidth}{\centering Placeholder. Heat map of one setting before relocation beside the heat map after relocation, with the moved obstacles indicated.}}
-\caption{Accessibility heat maps of one setting before and after the guided relocation, with the relocated obstacles indicated. The regained area corresponds to the gain reported in Table~\ref{tab:relocation}.}
-\label{fig:beforeafter}
-\end{figure}
+% TODO reinstate this figure once the before and after relocation heat maps
+% exist, and restore its reference in the paragraph above
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\linewidth]{figs/beforeafter.png}
+% \caption{Accessibility heat maps of one setting before and after the guided relocation, with the relocated obstacles indicated. The regained area corresponds to the gain reported in Table~\ref{tab:relocation}.}
+% \label{fig:beforeafter}
+% \end{figure}
  
 \subsection{Discussion}
 \label{sec:discussion}
@@ -348,11 +372,8 @@ Future work will extend validation to additional sites and larger intervention s
 % TODO review this drafted conclusion
 
 \section*{Acknowledgment}
-
-The preferred spelling of the word ``acknowledgment'' in America is without 
-an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
-G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
-acknowledgments in the unnumbered footnote on the first page.
+% TODO confirm the wording and add funding sources and collaborators
+The authors thank the site team at the New Science Centre construction project for supporting the field deployments.
 \bibliographystyle{IEEEtran}
 \bibliography{ref}
 
