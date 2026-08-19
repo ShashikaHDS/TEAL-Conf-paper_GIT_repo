@@ -11,11 +11,20 @@
 \usepackage{booktabs}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+% pack floats at the top of float-only pages instead of spreading them
+% apart with stretchy space, which caused large gaps between figures
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{10pt plus 4pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{10pt plus 4pt}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 \begin{document}
 
-\title{Conference Paper Title*\\
-{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
-should not be used}
+% TODO identify the applicable funding agency in \thanks, or delete it
+\title{The Robot Inclusivity Index: Measuring and Improving Construction Site Accessibility for Mobile Robots
 \thanks{Identify applicable funding agency here. If none, delete this.}
 }
 
@@ -59,13 +68,11 @@ email address or ORCID}
 \maketitle
 
 \begin{abstract}
-This document is a model and instructions for \LaTeX.
-This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
-or Math in Paper Title or Abstract.
+Construction robots can only work where they can physically reach, yet no existing method quantifies in advance how much of a site a given robot can access. This paper introduces the Robot Inclusivity Index, a closed-loop framework that turns a single three-dimensional point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot. From one scan, the framework generates a robot-specific traversable map that fuses footprint, overhead clearance, step, and slope tolerances, measures connected reachability within a required operating area to produce the index and an accessibility map, and ranks candidate physical site changes by their predicted gain in reachable area. A human-guided relocation interface recomputes the index live as an operator moves obstacles, and a repeat scan verifies the realised improvement. We validate the framework at an active construction site across nine staged environment settings using an omnidirectional transport robot and a quadruped. Predicted accessibility maps matched the maps annotated from deployment video on 92.4 percent of the labelled area, rising to 97.7 percent once boundary rendering effects are discounted. Because every assessment derives from the same scan, a single site visit can screen an entire fleet before deployment.
 \end{abstract}
 
 \begin{IEEEkeywords}
-component, formatting, style, styling, insert
+construction robotics, robot inclusivity, accessibility, traversability analysis, point cloud, mobile robots, field robotics
 \end{IEEEkeywords}
 
 \section{Introduction}
