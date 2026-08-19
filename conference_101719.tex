@@ -321,7 +321,7 @@ R4 & & & & \\
 \end{tabular}
 \end{table}
  
-\begin{figure}[t]
+\begin{figure}[!t]
 \centering
 % TODO replace placeholder with a representative before and after pair
 \framebox[\linewidth]{\rule{0pt}{3.2cm}\parbox{0.9\linewidth}{\centering Placeholder. Heat map of one setting before relocation beside the heat map after relocation, with the moved obstacles indicated.}}
@@ -334,7 +334,6 @@ R4 & & & & \\
 Taken together, the experiments answer the three questions in order. On the settings quantified at pixel level, the maps the framework predicted matched the behaviour annotated from video on 92.4\% of the labelled area, and on 97.7\% once boundary rendering effects are set aside, so the heat maps can be read as faithful forecasts of where a platform will and will not operate. The platform differences appeared where the parameters place them, which supports assessing an entire fleet from a single scan. The relocation tests show that the predicted gains are actionable rather than notional, since gains forecast in the interface were realised on the physical site and confirmed by an independent rescan. % TODO temper or strengthen this sentence once the four deltas are in
 Two limitations remain. Each assessment is a snapshot of a changing site, and all settings come from a single project, with four relocation tests forming a small sample. Broader validation across sites and larger intervention studies remain for future work.
 
-\clearpage % flush all remaining floats so every figure appears before the conclusion; revisit at camera-ready
 \section{Conclusion}
 \label{sec:conclusion}
 This paper introduced the Robot Inclusivity Index, a closed-loop framework that turns a single point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot, producing a robot-specific traversable map, an accessibility map, a single-figure index, and a ranked list of site changes with predicted gains. In a field study at an active construction site, the accessibility maps predicted for an omnidirectional and a legged platform matched the behaviour annotated from deployment video on 92.4\% of the labelled area, rising to 97.7\% once boundary rendering effects are discounted, and the guided-relocation loop was exercised end to end, from barrier diagnosis through operator-refined planning to physical changes verified by rescanning. % TODO add the measured relocation gains once Table~\ref{tab:relocation} is filled
