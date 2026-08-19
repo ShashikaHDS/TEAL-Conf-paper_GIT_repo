@@ -5,6 +5,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
+\usepackage[caption=false,font=footnotesize]{subfig}
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{booktabs}
@@ -218,14 +219,14 @@ Maximum climbable slope ($\theta_{\max}$) &x &x & x\\
  
 \subsection{Prediction Validation}
 \label{sec:validation}
-Across the nine settings we compared the heat map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video, the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:heatmaps} shows representative settings with the predicted heat map beside the annotated behaviour of the robot.
+Across the nine settings we compared the heat map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video, the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:heatmaps} shows representative settings for both platforms, with the predicted heat map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
 % TODO per-test-case agreement counts and the index per robot per setting
 % once the remaining annotation comparisons are final
 
 For five of the settings the comparison was quantified at pixel level. The behaviour observed in the deployment video was annotated onto a copy of the occupancy map, colouring the regions the robot reached and the required regions it could not enter with the same palette used by the predicted heat map. Because both maps are rendered from the same occupancy grid they align pixel for pixel, which we verified by phase correlation on the obstacle masks, and agreement therefore reduces to comparing labels at each location. We report the label similarity, the fraction of identically labelled pixels over the union of pixels labelled in either map, a denominator that penalises area coloured in only one of the two maps. Alongside it we report the colour agreement, the same fraction restricted to pixels labelled in both maps, and a tolerant variant of the label similarity that discounts pixels lying within three pixels of the other map's labelled region, which absorbs the rendering halo discussed below. Settings 1 to 3 were assessed with the Movilo and Settings 4 and 5 with the GO2, so the quantified comparison covers both an omnidirectional and a legged platform.
 % TODO state who performed the video annotation if the venue expects it
 
-Table~\ref{tab:similarity} summarises the outcome. The predicted and annotated maps carry the same label on 92.4\% of the union area overall, with per-setting values between 90.2\% and 94.1\%, and wherever both maps commit to a label they agree on 98.6\% of pixels. The gap between the two figures is dominated by a thin halo at region boundaries rather than by disagreement about accessibility. The video annotation paints its regions out to the obstacle edges while the rendered heat map leaves a narrow uncoloured margin, and per setting 80--99\% of the pixels labelled only in the annotated map lie within three pixels of the predicted region boundary. Discounting this halo raises the overall agreement to 97.7\%, and the largest contiguous interior disagreement across all five settings spans 637 pixels.
+Table~\ref{tab:similarity} summarises the outcome. The predicted and annotated maps carry the same label on 92.4\% of the union area overall, with per-setting values between 90.2\% and 94.1\%, and wherever both maps commit to a label they agree on 98.6\% of pixels. The gap between the two figures is dominated by a thin halo at region boundaries rather than by disagreement about accessibility, visible as the red outlines in the disagreement panels of Fig.~\ref{fig:heatmaps}. The video annotation paints its regions out to the obstacle edges while the rendered heat map leaves a narrow uncoloured margin, and per setting 80--99\% of the pixels labelled only in the annotated map lie within three pixels of the predicted region boundary. Discounting this halo raises the overall agreement to 97.7\%, and the largest contiguous interior disagreement across all five settings spans 637 pixels.
 % TODO confirm the pixel-to-metre scale of the rendered maps so the 637 px
 % patch can be expressed in square metres
 
@@ -253,10 +254,13 @@ The comparisons follow a consistent pattern. Obstacles placed at the edge of a r
  
 \begin{figure*}[t]
 \centering
-% TODO replace placeholder with panels, predicted heat map beside annotated
-% robot behaviour, representative settings, one row per robot
-\framebox[\textwidth]{\rule{0pt}{4cm}\parbox{0.9\textwidth}{\centering Placeholder. Predicted heat maps beside annotated robot behaviour for representative settings and all three target robots.}}
-\caption{Predicted accessibility heat maps compared with observed robot behaviour in representative environment settings. Regions predicted accessible and unreachable are distinguished by colour, and the annotated trajectory shows the motion the physical robot achieved.}
+\subfloat[Predicted]{\includegraphics[width=0.31\textwidth]{figs/setting1_predicted.png}}\hfil
+\subfloat[Annotated behaviour]{\includegraphics[width=0.31\textwidth]{figs/setting1_annotated.png}}\hfil
+\subfloat[Disagreement]{\includegraphics[width=0.31\textwidth]{figs/setting1_difference.png}}\\
+\subfloat[Predicted]{\includegraphics[width=0.31\textwidth]{figs/setting4_predicted.png}}\hfil
+\subfloat[Annotated behaviour]{\includegraphics[width=0.31\textwidth]{figs/setting4_annotated.png}}\hfil
+\subfloat[Disagreement]{\includegraphics[width=0.31\textwidth]{figs/setting4_difference.png}}
+\caption{Predicted accessibility heat maps compared with the maps annotated from observed robot behaviour, for Setting~1 with the Movilo (top row) and Setting~4 with the GO2 (bottom row). Green marks area the robot can reach and orange marks required area it cannot. The disagreement panels colour every pixel on which the two maps differ in red, showing that disagreement concentrates in a thin halo at the region boundaries rather than in the interior.}
 \label{fig:heatmaps}
 \end{figure*}
  
