@@ -94,21 +94,28 @@ We introduce the Robot Inclusivity Index (RII), a closed-loop framework that wor
  
 \begin{figure}[t]
 \centering
+\definecolor{flownavy}{RGB}{42,74,99}
+\definecolor{flowteal}{RGB}{58,166,160}
+\definecolor{floworange}{RGB}{224,130,50}
+\definecolor{flowgreen}{RGB}{46,139,87}
 \begin{tikzpicture}[
   font=\footnotesize,
   box/.style={draw, rounded corners=1.5pt, align=center, inner sep=3.5pt},
-  io/.style={box, fill=black!8},
-  out/.style={box, fill=black!16},
-  arr/.style={-{Stealth[length=2.2mm]}, semithick}
+  io/.style={box, draw=flowteal!70!black, fill=flowteal!20},
+  proc/.style={box, draw=flownavy, fill=flownavy!10},
+  out/.style={box, draw=flowgreen!80!black, fill=flowgreen!22},
+  act/.style={box, draw=floworange!85!black, fill=floworange!25},
+  arr/.style={-{Stealth[length=2.2mm]}, semithick, draw=flownavy},
+  fb/.style={arr, dashed, rounded corners=2pt, draw=floworange!85!black}
 ]
 \node[io] (scan) {3D point-cloud scan\\(audit robot, one walkthrough)};
 \node[io, right=3.5mm of scan] (params) {Target robot\\parameters};
-\node[box, below=5mm of $(scan.south)!0.5!(params.south)$] (trav) {Robot-specific traversable map};
-\node[box, below=3mm of trav] (acc) {Connected-reachability analysis};
+\node[proc, below=5mm of $(scan.south)!0.5!(params.south)$] (trav) {Robot-specific traversable map};
+\node[proc, below=3mm of trav] (acc) {Connected-reachability analysis};
 \node[out, below=3mm of acc] (rii) {RII score and accessibility map};
-\node[box, below=3mm of rii] (diag) {Barrier diagnosis and\\improvement ranking};
-\node[box, below=3mm of diag] (reloc) {Human-guided relocation plan};
-\node[box, below=3mm of reloc] (site) {Physical site changes};
+\node[proc, below=3mm of rii] (diag) {Barrier diagnosis and\\improvement ranking};
+\node[act, below=3mm of diag] (reloc) {Human-guided relocation plan};
+\node[act, below=3mm of reloc] (site) {Physical site changes};
 \draw[arr] (scan.south) -- ([xshift=-10mm]trav.north);
 \draw[arr] (params.south) -- ([xshift=10mm]trav.north);
 \draw[arr] (trav) -- (acc);
@@ -116,7 +123,8 @@ We introduce the Robot Inclusivity Index (RII), a closed-loop framework that wor
 \draw[arr] (rii) -- (diag);
 \draw[arr] (diag) -- (reloc);
 \draw[arr] (reloc) -- (site);
-\draw[arr] (site.west) -- ++(-5mm,0) |- node[pos=0.3, sloped, above, font=\scriptsize]{verification rescan} (scan.west);
+\coordinate (fbx) at ([xshift=-4mm]current bounding box.west);
+\draw[fb] (site.west) -- (fbx |- site.west) -- node[midway, rotate=90, above, font=\scriptsize, text=floworange!85!black]{verification rescan} (fbx |- scan.west) -- (scan.west);
 \end{tikzpicture}
 \caption{Overview of the closed-loop RII pipeline. An audit robot captures the site once as a 3D point cloud; combined with the physical parameters of a target robot, the framework produces a robot-specific traversable map, the Robot Inclusivity Index with its accessibility map, and a ranked relocation plan, and a repeat scan after the physical changes verifies the realised gain.}
 \label{fig:pipeline}
