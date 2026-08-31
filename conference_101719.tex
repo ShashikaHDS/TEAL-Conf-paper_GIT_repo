@@ -78,7 +78,7 @@ construction robotics, robot inclusivity, accessibility, traversability analysis
 \end{IEEEkeywords}
 
 \section{Introduction}
-The construction sector has long been one of the least automated of the major industries, and robots are now beginning to move from controlled factories onto construction sites.  Robots now take on a wide range of construction tasks, from three-dimensional concrete printing, bricklaying, and steel welding and assembly, through material transport, excavation, and drilling, to panel and facade installation, painting, plastering, tiling, surveying, inspection, and demolition, with one recent review screening 375 studies published between 2023 and 2025 alone~\cite{Gharbia2020-ml,Xu2026-cr}. The platforms carrying out this work vary widely in form, spanning wheeled and legged robots, gantry printers, and wearable exoskeletons. Their arrival is driven less by novelty than by necessity, since construction ranks among the least productive industries~\cite{Rathnayake2023-xt}, and moving robots into these tasks also removes workers from hazardous conditions. A large share of these tasks are performed by mobile robots that must travel across the site and position themselves at the work location. As a result, before a robot can transport a load, inspect a structure, or finish a surface, it must first physically reach the area where the work is to be done. Construction sites are unstructured, cluttered, and constantly changing~\cite{Xu2026-cr}, and the barriers reported in the literature are dominated by the physical environment rather than by any shortfall in what the robot can do.  Across surveyed studies, limitation in workspace is the single most cited challenge, reported in around 43\% of the papers that document barriers, ahead of structural integrity and the complexity of coordinating robot movement~\cite{Gharbia2020-ml}. Field assessments of active sites reveal several recurring constraints, among them human density, surface unevenness, accessibility, lighting variation, and dynamic clutter, and these constraints are not equal in weight. Accessibility is the binding one, because the others only matter in regions the robot can already reach, and once a region is reachable they become ordinary engineering problems with well-understood mitigations.
+The construction sector has long been one of the least automated of the major industries, and robots are now beginning to move from controlled factories onto construction sites.  Robots now take on a wide range of construction tasks, from concrete printing, bricklaying, and welding through material transport and excavation to painting, surveying, and inspection, with one recent review screening 375 studies published between 2023 and 2025 alone~\cite{Gharbia2020-ml,Xu2026-cr}. Their arrival is driven less by novelty than by necessity, since construction ranks among the least productive industries~\cite{Rathnayake2023-xt}, and moving robots into these tasks also removes workers from hazardous conditions. A large share of these tasks are performed by mobile robots that must travel across the site and position themselves at the work location. As a result, before a robot can transport a load, inspect a structure, or finish a surface, it must first physically reach the area where the work is to be done. Construction sites are unstructured, cluttered, and constantly changing~\cite{Xu2026-cr}, and the barriers reported in the literature are dominated by the physical environment rather than by any shortfall in what the robot can do.  Across surveyed studies, limitation in workspace is the single most cited challenge, reported in around 43\% of the papers that document barriers, ahead of structural integrity and the complexity of coordinating robot movement~\cite{Gharbia2020-ml}. Field assessments of active sites reveal several recurring constraints, among them human density, surface unevenness, accessibility, lighting variation, and dynamic clutter, and these constraints are not equal in weight. Accessibility is the binding one, because the others only matter in regions the robot can already reach, and once a region is reachable they become ordinary engineering problems with well-understood mitigations.
 
 
 
@@ -124,7 +124,7 @@ We introduce the Robot Inclusivity Index (RII), a closed-loop framework that wor
  
 Fig.~\ref{fig:pipeline} presents an overview of our framework, which turns a single scan of a construction site into a deployment assessment for any mobile robot. An audit robot traverses the site once and captures it as a three-dimensional map. The RII algorithm then combines this map with a compact description of a target robot and returns the Robot Inclusivity Index for that robot together with an accessibility map marking where on the site it can and cannot operate.
  
-Because the site capture is independent of any particular platform, the same scan serves every robot under consideration, and the assessment extends naturally from a single robot to an entire fleet. Our framework also goes beyond measurement. It highlights the regions that hold the score down, suggests changes that would raise it, lets a human operator shape those changes, and confirms the outcome with a repeat scan after the site has been modified. We detail each stage of this pipeline in Section~\ref{sec:method}.
+Because the site capture is independent of any particular platform, the same scan serves every robot under consideration, and the framework goes beyond measurement, highlighting the regions that hold the score down, letting a human operator shape the changes that would raise it, and confirming the outcome with a repeat scan. We detail each stage in Section~\ref{sec:method}.
  
 % =========================================================================
 \section{Robot Inclusivity for Construction Sites}
@@ -144,7 +144,7 @@ The value depends jointly on the environment and on the robot, the same site the
  
 \subsection{Data Collection}
 \label{sec:capture}
-We capture the site in a single walkthrough by the audit robot, a compact tracked platform that carries a 3D LiDAR, an inertial measurement unit, and a camera. The robot is driven through the representative open areas, passages, and obstacle zones of the site while a tightly coupled LiDAR-inertial SLAM pipeline based on LIO-SAM~\cite{Shan2020-ls} registers the sensor data into a three-dimensional point cloud in which every point is expressed in metres. A handheld version of the same sensor stack covers stairwells and areas the tracked platform cannot enter. One walkthrough is enough because the cloud records the geometry of the site rather than the experience of any particular robot. The output of this stage is a single point cloud that serves every later analysis, and the audit robot does not need to share any physical property with the robots being assessed. The scan represents the site at the moment of capture, and on an active site the assessment is refreshed by repeating the walkthrough.
+We capture the site in a single walkthrough by the audit robot, a compact tracked platform that carries a 3D LiDAR, an inertial measurement unit, and a camera. The robot is driven through the representative open areas, passages, and obstacle zones of the site while a tightly coupled LiDAR-inertial SLAM pipeline based on LIO-SAM~\cite{Shan2020-ls} registers the sensor data into a three-dimensional point cloud in which every point is expressed in metres. A handheld version of the same sensor stack covers areas the tracked platform cannot enter. One walkthrough is enough because the cloud records the geometry of the site rather than the experience of any particular robot, so the audit robot need not share any physical property with the robots being assessed, and on an active site the assessment is refreshed by repeating the walkthrough.
  
 \subsection{Robot-Specific Traversable Map Generation}
 \label{sec:travmap}
@@ -176,7 +176,7 @@ The final stage places a human in the loop to turn the ranked list into a workab
  
 \subsection{Validation Test Cases}
 \label{sec:testcases}
-The index is a prediction, and a prediction earns trust only when it matches what a physical robot experiences on the ground. We therefore validate the framework through controlled test cases, each of which stages one constraint that the algorithm claims to model and compares the predicted accessibility with the observed behaviour of the robot. The cases cover passage width between barriers, overhead clearance beneath low obstructions, obstacles placed at the edge of a route without blocking it, temporary partitions that close a passage completely, and steps and ramps near the tolerance of the platform, mirroring the parameter set of Section~\ref{sec:rii_def}. Each case is staged in two conditions, one within the capability of the robot and one beyond it, and a case is counted as correct when the prediction and the observed behaviour agree. A representative subset of these cases is exercised on the field site in Section~\ref{sec:results}.
+The index is a prediction, and a prediction earns trust only when it matches what a physical robot experiences on the ground. We therefore validate the framework through controlled test cases, each staging one constraint that the algorithm claims to model, mirroring the parameter set of Section~\ref{sec:rii_def}. Each case is staged in two conditions, one within the capability of the robot and one beyond it, and a case is counted as correct when the prediction and the observed behaviour agree; the cases are exercised on the field site in Section~\ref{sec:results}.
 
 
 % =========================================================================
@@ -188,26 +188,7 @@ We evaluate the framework at an active construction site and organise the experi
 
 \subsection{Experimental Setup}
 \label{sec:setup}
-We validated the framework at the New Science Centre construction site in Singapore, an active project whose cluttered and changing conditions match the environments the method targets. Five environment settings were selected across the site, and each setting stages one or more of the validation test cases of Section~\ref{sec:testcases}. Table~\ref{tab:settings} lists the staged cases and the conditions in which each was set up, following the two-condition design of the protocol. Table~\ref{tab:settingdetail} lists the platform, zone, and representative staged items of each setting. Setting~3 ran a reduced set because several planned test items were unavailable on the day, an ordinary constraint of working on an active site, and Setting~5 additionally recorded conditions found on site rather than staged.
-
-\begin{table}[t]
-\caption{Environment settings: platform assessed, zone, and representative staged and encountered items.}
-\label{tab:settingdetail}
-\centering
-\footnotesize
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}cclp{4.6cm}@{}}
-\toprule
-Setting & Zone & Robot & Staged and encountered items \\
-\midrule
-1 & 3 & Movilo & Corridor widths, safety cones, temporary partitions, material stacks, large materials \\
-2 & 2 & Movilo & Floor obstacles including consumables, wood offcuts, rebar, and a toolbox, narrow gaps, floor depressions \\
-3 & 3 & Movilo & Reduced set of four conditions with tight lateral clearances and a portable bump \\
-4 & 2 & GO2 & Corridor conditions with small floor obstacles, a hump, a plank, a hand tool, and a pallet \\
-5 & 4 & GO2 & Corridor height, wet floor, ramps of five and six degrees, a step fitted with a plywood ramp, protruding rebars, a parked aerial work machine, a light tower \\
-\bottomrule
-\end{tabular}
-\end{table}
+We validated the framework at the New Science Centre construction site in Singapore, an active project whose cluttered and changing conditions match the environments the method targets. Five environment settings were selected across the site, and each setting stages one or more of the validation test cases of Section~\ref{sec:testcases}. Table~\ref{tab:settings} lists the staged cases and the conditions in which each was set up, following the two-condition design of the protocol. The settings span three zones. With the Movilo, Setting~1 staged corridor widths, safety cones, temporary partitions, material stacks, and large materials, Setting~2 added denser floor obstacles including consumables, wood offcuts, rebar, and a toolbox together with narrow gaps and floor depressions, and Setting~3 ran a reduced set of four conditions because planned items were unavailable on the day. With the GO2, Setting~4 staged corridor conditions with small floor obstacles such as a hump, a plank, a hand tool, and a pallet, and Setting~5 combined staged cases with conditions found on site, among them a wet floor, ramps of five and six degrees, a step fitted with a plywood ramp, protruding rebars, and parked machinery.
 % NOTE wall reachability (TC-09) and stair climbing (TC-10) from the wider
 % catalogue are outside this paper's scope and are omitted from the table
  
@@ -229,7 +210,7 @@ No & Test item & Staged conditions \\
 \midrule
 01 & Corridor width & Width above and at or below the robot width \\
 02 & Corridor height & Clearance above and at or below the robot height \\
-03 & Floor obstacles & Safety items, partitions, stacked and large materials, containers, scaffolding, rebars, cables, hoses, humans, and consumables, each placed at the edge of the route and then blocking it \\
+03 & Floor obstacles & Eleven obstacle types, from safety items and partitions to cables and consumables, each placed at the edge of the route and then blocking it \\
 04 & Step & Step height within and beyond the climbing tolerance \\
 05 & Ramp & Ramp angle below and above the maximum climbing angle \\
 06 & Bump & Bump height below, near, and above the ground clearance \\
@@ -343,7 +324,7 @@ Overall & & 92.6\% & 98.7\% & 97.9\% & 58/60 & $+4.6$ \\
 \end{tabular}
 \end{table}
 
-The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, and passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable. Setting~5 extended the validation beyond staged cases to conditions found on site, a wet floor, two ramps of five and six degrees, a step fitted with a plywood ramp, protruding rebars, and parked machinery, all predicted correctly.
+The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the conditions Setting~5 encountered on site were all predicted correctly.
 
 \subsection{Closed-Loop Site Improvement}
 \label{sec:loop}
