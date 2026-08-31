@@ -192,8 +192,7 @@ We validated the framework at the New Science Centre construction site in Singap
 % NOTE wall reachability (TC-09) and stair climbing (TC-10) from the wider
 % catalogue are outside this paper's scope and are omitted from the table
  
-For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction ground that % TODO confirm the LiDAR model, the project report states an Ouster OS0-128
-carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing running on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
+For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction ground that carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing running on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
  
 We assessed two target robots in the staged validation, chosen for their deliberately different forms, an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320).
 % TODO confirm the painting robot model name
