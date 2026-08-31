@@ -70,7 +70,7 @@ email address or ORCID}
 \maketitle
 
 \begin{abstract}
-Construction robots can only work where they can physically reach, yet no existing method quantifies in advance how much of a site a given robot can access. This paper introduces the Robot Inclusivity Index, a closed-loop framework that turns a single three-dimensional point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot. From one scan, the framework generates a robot-specific traversable map that fuses footprint, overhead clearance, step, and slope tolerances, measures connected reachability within a required operating area to produce the index and an accessibility map, and ranks candidate physical site changes by their predicted gain in reachable area. A human-guided relocation interface recomputes the index live as an operator moves obstacles, and a repeat scan verifies the realised improvement. We validate the framework at an active construction site across five staged environment settings using an omnidirectional transport robot and a quadruped. Predicted accessibility maps matched the maps annotated from deployment video on 92.6 percent of the labelled area, rising to 97.9 percent once annotation boundary effects are discounted, and 58 of 60 staged test conditions were predicted correctly. Because every assessment derives from the same scan, a single site visit can screen an entire fleet before deployment.
+Construction robots can only work where they can physically reach, yet no existing method quantifies in advance how much of a site a given robot can access. This paper introduces the Robot Inclusivity Index, a closed-loop framework that turns a single three-dimensional point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot. From one scan, the framework generates a robot-specific traversable map that fuses footprint, overhead clearance, step, and slope tolerances, measures connected reachability within a required operating area to produce the index and an accessibility map, and ranks candidate physical site changes by their predicted gain in reachable area. A human-guided relocation interface recomputes the index live as an operator moves obstacles, and a repeat scan verifies the realised improvement. We validate the framework at an active construction site across five staged environment settings using an omnidirectional transport robot and a quadruped. Predicted accessibility maps matched the maps annotated from deployment video on 92.6 percent of the labelled area, rising to 97.9 percent once annotation boundary effects are discounted, and 58 of 60 staged test conditions were predicted correctly. In four further cluttered areas, physical adjustments guided by the framework raised the index from as low as 44 percent to above 93 percent, measured by repeat scans. Because every assessment derives from the same scan, a single site visit can screen an entire fleet before deployment.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -184,7 +184,7 @@ The index is a prediction, and a prediction earns trust only when it matches wha
 \label{sec:results}
 % =========================================================================
  
-We evaluate the framework at an active construction site and organise the experiments around three questions, whether the predicted accessibility maps match the behaviour of physical robots, whether the index separates platforms of different capability on the same site, and whether the improvement measured after relocating obstacles matches the improvement the framework predicted.
+We evaluate the framework at an active construction site and organise the experiments around three questions, whether the predicted accessibility maps match the behaviour of physical robots, whether the index separates platforms of different capability on the same site, and whether physical adjustments guided by the framework's barrier diagnosis produce measured gains in accessibility.
 
 \subsection{Experimental Setup}
 \label{sec:setup}
@@ -195,9 +195,8 @@ We validated the framework at the New Science Centre construction site in Singap
 For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction ground that % TODO confirm the LiDAR model, the project report states an Ouster OS0-128
 carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing running on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
  
-We assessed two target robots chosen for their deliberately different forms, an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2).
-% NOTE the BES FT-P320 painting robot was scanned for but its assessment is
-% not yet complete; reinstate it here and in Table II once its data is final
+We assessed two target robots in the staged validation, chosen for their deliberately different forms, an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320).
+% TODO confirm the painting robot model name
 For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility heat map for that robot in that setting. Assessing two platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine.
  
 \begin{table}[t]
@@ -227,18 +226,19 @@ No & Test item & Staged conditions \\
 \caption{Physical and mobility parameters of the target robots.}
 \label{tab:robots}
 \centering
-% TODO fill the GO2 height, step and slope tolerances, and the Movilo slope
-% tolerance; Movilo values from the project report (height loaded with goods)
-\begin{tabular}{lcc}
+% TODO fill the GO2 height, step and slope tolerances, the Movilo slope
+% tolerance, and all FT-P320 values; Movilo values from the project report
+% (height loaded with goods)
+\begin{tabular}{lccc}
 \toprule
-Parameter & Movilo & GO2 \\
+Parameter & Movilo & GO2 & FT-P320 \\
 \midrule
-Length (L) & 0.98\,m & 0.70\,m \\
-Width (W) & 0.95\,m & 0.40\,m \\
-Height (H) & 0.50\,m & x \\
-Maximum climbable step ($s_{\max}$) & 0.045\,m & x \\
-Maximum climbable slope ($\theta_{\max}$) & x & x \\
-Drive type ($d$) & Omnidirectional & Legged \\
+Length (L) & 0.98\,m & 0.70\,m & x \\
+Width (W) & 0.95\,m & 0.40\,m & x \\
+Height (H) & 0.50\,m & x & x \\
+Maximum climbable step ($s_{\max}$) & 0.045\,m & x & x \\
+Maximum climbable slope ($\theta_{\max}$) & x & x & x \\
+Drive type ($d$) & Omnidirectional & Legged & x \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -325,46 +325,46 @@ The comparisons follow a consistent pattern. Obstacles placed at the edge of a r
 
 \subsection{Closed-Loop Site Improvement}
 \label{sec:loop}
-The closed loop of Section~\ref{sec:relocation} was exercised in four of the settings. In each test the framework computed the as-found index, the barrier diagnosis proposed the relocation of blocking obstacles, an operator refined and confirmed the plan in the interface, the site team applied the changes physically, and the audit robot rescanned the area for a second assessment. Table~\ref{tab:relocation} reports, for each test, the as-found index, the index predicted after the planned relocation, and the index measured from the repeat scan.
-% TODO fill tab:relocation from the four before and after tests
-\textit{[Sentence to be added, the measured gains tracked the predicted gains within X percentage points across the four tests.]}
+The closed loop of Section~\ref{sec:relocation} was exercised in four further areas of the site over two deployment days, labelled R1 to R4, with the Movilo and the painting robot assessed from the same scans where both were available.
+% TODO confirm whether the four July test areas belong to the same site as
+% Settings 1 to 5
+In each test the audit robot scanned the area, the framework computed the as-found index and attributed the unreachable regions to blocking obstacles, movable obstacles were then physically relocated, and a repeat scan of the adjusted area measured the realised index. Table~\ref{tab:relocation} reports the results, and Fig.~\ref{fig:beforeafter} shows a representative pair of maps. The as-found indices, between 44.3\% and 78.1\%, confirm that clutter on an active site can deny a robot half of its required workspace, and the adjustments raised every area above 93\%, with gains of 15.6 to 52.1 percentage points and a mean of 37. Where both platforms were assessed on the same scans their indices moved together, the painting robot finishing up to two points above the Movilo, so a single round of site preparation served both robots. Re-deploying the physical robots on the adjusted areas to verify the regained access, and comparing the gains predicted in the relocation interface with these measured ones, remain to be reported.
  
 \begin{table}[t]
-\caption{Closed-loop relocation tests, predicted and measured index.}
+\caption{Closed-loop adjustment tests: the RII as found and after the physical relocation of movable obstacles, both measured from scans, in percent. R1 and R2 were tested on the first deployment day, R3 and R4 on the second.}
 \label{tab:relocation}
 \centering
 \footnotesize
-% TODO fill the four rows, values in percent
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}llccc@{}}
 \toprule
-Test & Robot & As-found & Predicted after & Measured after \\
+Test & Robot & As found & After & Gain \\
 \midrule
-R1 & \textit{[fill]} & & & \\
-R2 & & & & \\
-R3 & & & & \\
-R4 & & & & \\
+R1 & Movilo & 44.3 & 96.1 & $+51.8$ \\
+R1 & FT-P320 & 44.8 & 96.9 & $+52.1$ \\
+R2 & Movilo & 78.1 & 93.7 & $+15.6$ \\
+R3 & FT-P320 & 46.8 & 95.4 & $+48.6$ \\
+R4 & Movilo & 68.6 & 94.6 & $+26.0$ \\
+R4 & FT-P320 & 68.7 & 96.3 & $+27.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
  
-% TODO reinstate this figure once the before and after relocation heat maps
-% exist, and restore its reference in the paragraph above
-% \begin{figure}[!t]
-% \centering
-% \includegraphics[width=\linewidth]{figs/beforeafter.png}
-% \caption{Accessibility heat maps of one setting before and after the guided relocation, with the relocated obstacles indicated. The regained area corresponds to the gain reported in Table~\ref{tab:relocation}.}
-% \label{fig:beforeafter}
-% \end{figure}
+\begin{figure}[!t]
+\centering
+\subfloat[As found, RII 44.3\%]{\includegraphics[width=0.48\linewidth]{figs/beforeafter_before.png}}\hfil
+\subfloat[After adjustment, RII 96.1\%]{\includegraphics[width=0.48\linewidth]{figs/beforeafter_after.png}}
+\caption{Accessibility maps of closed-loop test R1 (Movilo) before and after the physical adjustment. Required area that was unreachable as found (orange) becomes reachable (green) after movable obstacles were relocated; the regained area corresponds to the gain reported in Table~\ref{tab:relocation}.}
+\label{fig:beforeafter}
+\end{figure}
  
 \subsection{Discussion}
 \label{sec:discussion}
-Taken together, the experiments answer the three questions in order. Across the five settings the maps the framework predicted matched the behaviour annotated from video on 92.6\% of the labelled area, on 97.9\% once the annotation boundary band is set aside, and on 58 of 60 staged conditions, so the heat maps can be read as faithful forecasts of where a platform will and will not operate. The fourteen route-level discrepancies trace to three mechanisms, the filtering of small floor-level objects from the cloud, footprint clearance not being enforced between pairs of obstacles, and negative obstacles such as floor depressions that a point-cloud pipeline cannot see, and each maps to a concrete pipeline improvement, namely platform-aware filtering thresholds, footprint enforcement between obstacle pairs, and negative-obstacle detection from the ground plane. The direction of the first mechanism is platform-dependent, optimistic for the wheeled platform and conservative for the quadruped, which supports assessing a fleet from a single scan while showing that footprint and climbing tolerances alone do not fully capture how a legged platform negotiates small obstacles. The consistently optimistic index bias argues for reading a reported RII as an upper bound on deployment readiness. The relocation tests show that the predicted gains are actionable rather than notional, since gains forecast in the interface were realised on the physical site and confirmed by an independent rescan. % TODO temper or strengthen this sentence once the four deltas are in
+Taken together, the experiments answer the three questions in order. Across the five settings the maps the framework predicted matched the behaviour annotated from video on 92.6\% of the labelled area, on 97.9\% once the annotation boundary band is set aside, and on 58 of 60 staged conditions, so the heat maps can be read as faithful forecasts of where a platform will and will not operate. The fourteen route-level discrepancies trace to three mechanisms, the filtering of small floor-level objects from the cloud, footprint clearance not being enforced between pairs of obstacles, and negative obstacles such as floor depressions that a point-cloud pipeline cannot see, and each maps to a concrete pipeline improvement, namely platform-aware filtering thresholds, footprint enforcement between obstacle pairs, and negative-obstacle detection from the ground plane. The direction of the first mechanism is platform-dependent, optimistic for the wheeled platform and conservative for the quadruped, which supports assessing a fleet from a single scan while showing that footprint and climbing tolerances alone do not fully capture how a legged platform negotiates small obstacles. The consistently optimistic index bias argues for reading a reported RII as an upper bound on deployment readiness. The adjustment tests show that the diagnosed barriers are actionable: relocating movable obstacles raised the index in every area, by 15.6 to 52.1 percentage points, and the near-identical response of the two platforms assessed on the same scans indicates that one round of site preparation can serve several robots at once.
 Two limitations remain. Each assessment is a snapshot of a changing site, and all settings come from a single project, with four relocation tests forming a small sample. Broader validation across sites and larger intervention studies remain for future work.
 
 \section{Conclusion}
 \label{sec:conclusion}
-This paper introduced the Robot Inclusivity Index, a closed-loop framework that turns a single point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot, producing a robot-specific traversable map, an accessibility map, a single-figure index, and a ranked list of site changes with predicted gains. In a field study at an active construction site, the accessibility maps predicted for an omnidirectional and a legged platform matched the behaviour annotated from deployment video on 92.6\% of the labelled area, rising to 97.9\% once annotation boundary effects are discounted, 58 of 60 staged test conditions were predicted correctly, and the guided-relocation loop was exercised end to end, from barrier diagnosis through operator-refined planning to physical changes verified by rescanning. % TODO add the measured relocation gains once Table~\ref{tab:relocation} is filled
-Future work will extend validation to additional sites and larger intervention studies, and broaden the index beyond accessibility to the other dimensions of robot inclusivity.
+This paper introduced the Robot Inclusivity Index, a closed-loop framework that turns a single point-cloud walkthrough of a construction site into a deployment assessment for any mobile robot, producing a robot-specific traversable map, an accessibility map, a single-figure index, and a ranked list of site changes with predicted gains. In a field study at an active construction site, the accessibility maps predicted for an omnidirectional and a legged platform matched the behaviour annotated from deployment video on 92.6\% of the labelled area, rising to 97.9\% once annotation boundary effects are discounted, 58 of 60 staged test conditions were predicted correctly, and physically adjusting four further cluttered areas guided by the framework's barrier diagnosis raised their indices from as low as 44\% to above 93\%, a mean gain of 37 percentage points measured by repeat scans. Future work will verify the adjusted areas through robot re-deployment, extend validation to additional sites and larger intervention studies, and broaden the index beyond accessibility to the other dimensions of robot inclusivity.
 % TODO review this drafted conclusion
 
 \section*{Acknowledgment}
