@@ -225,18 +225,21 @@ No & Test item & Staged conditions \\
 \caption{Physical and mobility parameters of the target robots.}
 \label{tab:robots}
 \centering
-% TODO fill the GO2 height, step and slope tolerances, the Movilo slope
-% tolerance, and the FT-P320 step, slope, and drive type; Movilo values from
-% the project report (height loaded with goods)
+% TODO fill the Movilo slope tolerance and the FT-P320 step, slope, and
+% drive type; Movilo values from the project report (height loaded with
+% goods); GO2 standing dimensions and tolerances from the official Unitree
+% specifications
+% TODO confirm the GO2 variant: 0.16 m and 40 deg hold for Pro/X/Edu, the
+% Air model is 0.15 m and 30 deg
 \begin{tabular}{lccc}
 \toprule
 Parameter & Movilo & GO2 & FT-P320 \\
 \midrule
 Length (L) & 0.98\,m & 0.70\,m & 0.85\,m \\
-Width (W) & 0.95\,m & 0.40\,m & 0.76\,m \\
-Height (H) & 0.50\,m & x & 1.78\,m \\
-Maximum climbable step ($s_{\max}$) & 0.045\,m & x & x \\
-Maximum climbable slope ($\theta_{\max}$) & x & x & x \\
+Width (W) & 0.95\,m & 0.31\,m & 0.76\,m \\
+Height (H) & 0.50\,m & 0.40\,m & 1.78\,m \\
+Maximum climbable step ($s_{\max}$) & 0.045\,m & 0.16\,m & x \\
+Maximum climbable slope ($\theta_{\max}$) & x & $40^{\circ}$ & x \\
 Drive type ($d$) & Omnidirectional & Legged & x \\
 \bottomrule
 \end{tabular}
