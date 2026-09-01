@@ -154,9 +154,18 @@ The Robot Inclusivity Index quantifies the inclusivity of a site along the acces
 \end{equation}
 The value depends jointly on the environment and on the robot, so the same site yields a different index for each platform, and a higher value indicates better deployment readiness for that robot on that site.
  
-\subsection{Data Collection}
+\subsection{Audit Robot and Data Collection}
 \label{sec:capture}
-We capture the site in a single walkthrough by the audit robot, a compact tracked platform that carries a 3D LiDAR and an inertial measurement unit. The robot is driven through the representative open areas, passages, and obstacle zones of the site while a tightly coupled LiDAR-inertial SLAM pipeline based on LIO-SAM~\cite{Shan2020-ls} registers the sensor data into a three-dimensional point cloud in which every point is expressed in metres. A handheld version of the same sensor stack covers areas the tracked platform cannot enter. One walkthrough is enough because the cloud records the geometry of the site rather than the experience of any particular robot, so the audit robot need not share any physical property with the robots being assessed, and on an active site the assessment is refreshed by repeating the walkthrough.
+The audit scans are captured by the TEAL audit robot (Fig.~\ref{fig:platform}), a tracked platform we developed for construction floors, where loose debris, uneven terrain, and steep transitions defeat most wheeled bases. A commercial tracked chassis was adapted through in-house mechanical, electrical, and software design: brushless DC motors with Modbus-controlled drivers replace the original drive, an aluminium top plate layers the sensing and compute hardware above a 24\,V LiFePO$_{4}$ power stage, and safety combines a rear hardware emergency stop with a 250\,ms command watchdog. The sensor head pairs an Ouster OS1-128U 3D LiDAR with a VectorNav VN-100 rugged IMU, preferred over the LiDAR's internal IMU for its tolerance of track-induced vibration, alongside a stereo camera and a 2D LiDAR, and an NVIDIA Jetson AGX Orin runs the full ROS~2 stack onboard, supporting teleoperated capture as well as autonomous navigation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/audit_robot.png}
+\caption{The TEAL audit robot, a tracked platform developed for construction floors, with the sensor layer (3D LiDAR, camera, 2D LiDAR) above the chassis and the rear power controls with the hardware emergency stop.}
+\label{fig:platform}
+\end{figure}
+
+To capture a site, the robot is driven through its representative open areas, passages, and obstacle zones while a tightly coupled LiDAR-inertial SLAM pipeline based on LIO-SAM~\cite{Shan2020-ls} registers the sensor data into a three-dimensional point cloud in which every point is expressed in metres. A handheld unit pairing the same sensor stack with a backpack battery covers areas the tracked platform cannot enter, such as stairwells and narrow corridors. One walkthrough is enough because the cloud records the geometry of the site rather than the experience of any particular robot, so the audit robot need not share any physical property with the robots being assessed, and on an active site the assessment is refreshed by repeating the walkthrough.
  
 \subsection{Robot-Specific Traversable Map Generation}
 \label{sec:travmap}
@@ -239,7 +248,7 @@ With the Movilo, Setting~1 staged corridor widths, safety cones, temporary parti
 % NOTE wall reachability (TC-09) and stair climbing (TC-10) from the wider
 % catalogue are outside this paper's scope and are omitted from the table
  
-For every setting we first captured the geometry with the TEAL audit robot, a compact tracked platform we developed for construction terrain. It carries an Ouster OS1-128U LiDAR and a VectorNav VN-100 rugged IMU, with the VN-100 rather than the internal IMU of the LiDAR supplying the inertial input, and all onboard processing runs on an NVIDIA Jetson AGX Orin. The robot was teleoperated through each selected area while LIO-SAM~\cite{Shan2020-ls} registered the sensor stream into a three-dimensional point cloud, and the saved cloud is the input to every later analysis.
+For every setting the audit robot of Section~\ref{sec:capture} was teleoperated through the selected area, and the saved point cloud is the input to every later analysis.
  
 We assessed two target robots in the staged validation, chosen for their deliberately different forms: an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320).
 % TODO confirm the painting robot model name
