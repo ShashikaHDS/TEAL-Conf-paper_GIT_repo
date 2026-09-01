@@ -257,9 +257,10 @@ We assessed two target robots in the staged validation, chosen for their deliber
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\linewidth]{figs/robots_on_site.png}\\[3pt]
-\includegraphics[width=\linewidth]{figs/targets_in_action.png}
-\caption{Field deployment. Top: the Movilo, the TEAL audit robot, and the GO2 at the site. Bottom: the target robots during staged validation, the Movilo at a large item placed along the wall (left) and the GO2 at a scaffold base placed at the side of the path (right), both correctly predicted accessible.}
+\subfloat[]{\includegraphics[width=\linewidth]{figs/robots_on_site.png}}\\[1pt]
+\subfloat[]{\includegraphics[width=0.64\linewidth]{figs/movilo_action.png}}\hfil
+\subfloat[]{\includegraphics[width=0.325\linewidth]{figs/go2_action.png}}
+\caption{Field deployment: (a) the Movilo, the TEAL audit robot, and the GO2 at the site; (b) the Movilo at a large item placed along the wall; (c) the GO2 at a scaffold base beside the path, both conditions correctly predicted accessible.}
 \label{fig:field}
 \end{figure}
 For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility map for that robot in that setting. Assessing two platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine. Both platforms assessed can rotate in place, so the differential and car-like branches of the drive-type input are not exercised by these experiments.
@@ -383,8 +384,9 @@ The comparisons follow a consistent pattern. Obstacles placed at the edge of a r
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\linewidth]{figs/staged_condition_go2.png}
-\caption{A staged condition from Setting~4: a consumable blocking the GO2's main route, marked by the red box in the behind-robot view (left) and at its location on the accessibility map computed for the GO2 (right); the robot could not pass, matching the prediction.}
+\subfloat[]{\includegraphics[width=0.39\linewidth]{figs/go2_consumable_photo.png}}\hfil
+\subfloat[]{\includegraphics[width=0.575\linewidth]{figs/go2_consumable_map.png}}
+\caption{A staged condition from Setting~4, a consumable blocking the GO2's main route: (a) the behind-robot view with the consumable marked in red; (b) its location on the accessibility map computed for the GO2. The robot could not pass, matching the prediction.}
 \label{fig:staged_go2}
 \end{figure} A case-by-case inspection of the disagreement panels against the deployment video further identified fourteen localised route-level discrepancies, regions where the annotated behaviour contradicts the prediction; Section~\ref{sec:discussion} traces them to their mechanisms.
 % TODO confirm whether the two missed test conditions are among the
