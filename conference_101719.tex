@@ -388,30 +388,18 @@ The comparisons follow a consistent pattern. Obstacles placed at the edge of a r
 The closed loop of Section~\ref{sec:relocation} was exercised in four further areas of the site over two deployment days, labelled R1 to R4, with the Movilo and the painting robot assessed from the same scans where both were available.
 % TODO confirm whether the four July test areas belong to the same site as
 % Settings 1 to 5
-In each test the audit robot scanned the area, and the framework computed the as-found index and attributed the unreachable regions to blocking obstacles; movable obstacles were then physically relocated, and a repeat scan of the adjusted area measured the realised index. Table~\ref{tab:relocation} reports the results, and Fig.~\ref{fig:beforeafter} shows a representative pair of maps.
+In each test the audit robot scanned the area, and the framework computed the as-found index and attributed the unreachable regions to blocking obstacles; movable obstacles were then physically relocated, and a repeat scan of the adjusted area measured the realised index. Fig.~\ref{fig:gains} reports the results, and Fig.~\ref{fig:beforeafter} shows a representative pair of maps.
 % TODO if the interface-predicted (optimised) indices for R1-R4 were
 % recorded, add them as a Predicted column here and report the
 % predicted-versus-measured gap in the text
 The as-found indices, between 44.3\% and 78.1\%, confirm that clutter on an active site can deny a robot half of its required workspace, and the adjustments raised every area above 93\%, with gains of 15.6 to 52.1 percentage points and a mean of 37. Where both platforms were assessed on the same scans their indices moved together, the painting robot finishing up to two points above the Movilo, so a single round of site preparation served both robots.
  
-\begin{table}[t]
-\caption{Closed-loop tests: RII as found and after relocating movable obstacles, measured from scans; gains in percentage points. R1 and R2 on day one, R3 and R4 on day two.}
-\label{tab:relocation}
+\begin{figure}[!t]
 \centering
-\footnotesize
-\begin{tabular}{@{}llccc@{}}
-\toprule
-Test & Robot & As found (\%) & After (\%) & Gain (pp) \\
-\midrule
-R1 & Movilo & 44.3 & 96.1 & $+51.8$ \\
-R1 & FT-P320 & 44.8 & 96.9 & $+52.1$ \\
-R2 & Movilo & 78.1 & 93.7 & $+15.6$ \\
-R3 & FT-P320 & 46.8 & 95.4 & $+48.6$ \\
-R4 & Movilo & 68.6 & 94.6 & $+26.0$ \\
-R4 & FT-P320 & 68.7 & 96.3 & $+27.6$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\linewidth]{figs/gains_chart.pdf}
+\caption{Closed-loop tests: RII as found and after relocating movable obstacles, both measured from scans. R1 and R2 were tested on the first deployment day, R3 and R4 on the second.}
+\label{fig:gains}
+\end{figure}
  
 \begin{figure}[!t]
 \centering
