@@ -212,8 +212,10 @@ The first term is recovered only by choosing a more capable robot, the second on
 \label{sec:barriers}
 A score states how inclusive the site is but not what to change, and the framework therefore explains its own result. Cells inside the required area that remain unreachable are clustered into barrier regions, and each region is attributed to a geometric cause, for example a passage narrower than the footprint, a step above tolerance, a slope above tolerance, or a freestanding obstacle blocking a corridor. For barriers caused by freestanding obstacles, the algorithm simulates the removal of the blocking obstacle cluster, recomputes the map, and records the resulting change in the index. Formally, write $\mathrm{RII}[N]$ for the index obtained by carrying a modified map through \eqref{eq:inflate}, \eqref{eq:areas}, and \eqref{eq:riih}, and let $\Omega_{j}(c)=1$ on the cells that are non-traversable only through the occupancy term of \eqref{eq:ntrav} and are attributed to the $j$-th movable obstacle. The predicted gain of removing obstacle $j$ and the optimised score from removing all candidates together are
 \begin{equation}
-g_{j} = \mathrm{RII}\bigl[(1-\Omega_{j})N\bigr] - \mathrm{RII}[N], \qquad
-\mathrm{RII}^{\ast} = \mathrm{RII}\Bigl[N \prod\nolimits_{j}(1-\Omega_{j})\Bigr],
+\begin{split}
+g_{j} &= \mathrm{RII}\bigl[(1-\Omega_{j})N\bigr] - \mathrm{RII}[N],\\
+\mathrm{RII}^{\ast} &= \mathrm{RII}\Bigl[N \prod\nolimits_{j}(1-\Omega_{j})\Bigr],
+\end{split}
 \label{eq:gain}
 \end{equation}
 with the products taken per cell; because removals interact, the individual gains $g_{j}$ need not sum to $\mathrm{RII}^{\ast} - \mathrm{RII}[N]$. The optimised score $\mathrm{RII}^{\ast}$ is reported alongside the as-found score, and the pair bounds the improvement achievable through site preparation alone. Candidate improvements are then ranked by $g_{j}$, producing a prioritised list of actions such as relocating specific obstacles, widening a corridor, lowering a ramp, or adding an access opening. Whether an obstacle can actually be moved is judged by the operator in the relocation stage that follows.
