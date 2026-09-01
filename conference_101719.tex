@@ -252,14 +252,14 @@ With the Movilo, Setting~1 staged corridor widths, safety cones, temporary parti
  
 For every setting the audit robot of Section~\ref{sec:capture} was teleoperated through the selected area, and the saved point cloud is the input to every later analysis.
  
-We assessed two target robots in the staged validation, chosen for their deliberately different forms: an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320). Fig.~\ref{fig:field} (top) shows the audit robot and the two staged-validation platforms at the site.
+We assessed two target robots in the staged validation, chosen for their deliberately different forms: an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320). Fig.~\ref{fig:field} shows the platforms at the site and the two target robots during staged validation.
 % TODO confirm the painting robot model name
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figs/robots_on_site.png}\\[3pt]
-\includegraphics[width=\linewidth]{figs/staged_condition_go2.png}
-\caption{Field deployment. Top: the Movilo, the TEAL audit robot, and the GO2 at the site. Bottom: a staged test condition for the GO2 in Setting~4, a consumable blocking the main route, marked by the red box in the behind-robot view (left) and at its location on the accessibility map computed for the GO2 (right); the robot could not pass, matching the prediction.}
+\includegraphics[width=0.88\linewidth]{figs/robots_on_site.png}\\[3pt]
+\includegraphics[width=\linewidth]{figs/targets_in_action.png}
+\caption{Field deployment. Top: the Movilo, the TEAL audit robot, and the GO2 at the site. Bottom: the target robots during staged validation, the Movilo at a large item placed along the wall (left) and the GO2 at a scaffold base placed at the side of the path (right), both correctly predicted accessible.}
 \label{fig:field}
 \end{figure}
 For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility map for that robot in that setting. Assessing two platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine. Both platforms assessed can rotate in place, so the differential and car-like branches of the drive-type input are not exercised by these experiments.
@@ -317,7 +317,7 @@ Drive type $d$ & Holonomic (omni.) & Legged & Holonomic (omni.) \\
  
 \subsection{Prediction Validation}
 \label{sec:validation}
-Across the five settings we compared the accessibility map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video; the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:field} (bottom) shows one such staged condition beside the prediction it tests, and Fig.~\ref{fig:heatmaps} shows all five settings, with the predicted map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
+Across the five settings we compared the accessibility map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video; the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:heatmaps} shows all five settings, with the predicted map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
 \begin{figure*}[!t]
 \centering
 \makebox[0.25\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
@@ -379,7 +379,14 @@ Overall & & 94.6 & 92.6 & 98.7 & 97.9 & 58/60 & $+4.6$ \\
 \end{tabular}
 \end{table}
 
-The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the conditions Setting~5 encountered on site were all predicted correctly, with the caveat that slipperiness lies outside the geometric scope of the index, so the wet floor's accessible marking rests on geometry alone. A case-by-case inspection of the disagreement panels against the deployment video further identified fourteen localised route-level discrepancies, regions where the annotated behaviour contradicts the prediction; Section~\ref{sec:discussion} traces them to their mechanisms.
+The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the conditions Setting~5 encountered on site were all predicted correctly, with the caveat that slipperiness lies outside the geometric scope of the index, so the wet floor's accessible marking rests on geometry alone. Fig.~\ref{fig:staged_go2} shows one such correctly predicted condition beside its prediction.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{figs/staged_condition_go2.png}
+\caption{A staged condition from Setting~4: a consumable blocking the GO2's main route, marked by the red box in the behind-robot view (left) and at its location on the accessibility map computed for the GO2 (right); the robot could not pass, matching the prediction.}
+\label{fig:staged_go2}
+\end{figure} A case-by-case inspection of the disagreement panels against the deployment video further identified fourteen localised route-level discrepancies, regions where the annotated behaviour contradicts the prediction; Section~\ref{sec:discussion} traces them to their mechanisms.
 % TODO confirm whether the two missed test conditions are among the
 % fourteen route-level discrepancies, and state it here
 
