@@ -250,8 +250,15 @@ With the Movilo, Setting~1 staged corridor widths, safety cones, temporary parti
  
 For every setting the audit robot of Section~\ref{sec:capture} was teleoperated through the selected area, and the saved point cloud is the input to every later analysis.
  
-We assessed two target robots in the staged validation, chosen for their deliberately different forms: an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320).
+We assessed two target robots in the staged validation, chosen for their deliberately different forms: an omnidirectional transport robot (Movilo) and a quadruped (Unitree GO2); the closed-loop tests of Section~\ref{sec:loop} additionally assess a painting robot (BES FT-P320). Fig.~\ref{fig:robots} shows the audit robot and the two staged-validation platforms at the site.
 % TODO confirm the painting robot model name
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/robots_on_site.png}
+\caption{The platforms at the deployment site: the Movilo omnidirectional transport robot, the TEAL audit robot, and the Unitree GO2 quadruped.}
+\label{fig:robots}
+\end{figure}
 For each setting the framework received the point cloud together with the parameter set of the robot under assessment, listed in Table~\ref{tab:robots}, and returned the index and an accessibility map for that robot in that setting. Assessing two platforms of different geometry, tolerance, and drive from the same scans exercises the robot-specific character of the method, since every setting yields a different traversable map and a different index for each machine. Both platforms assessed can rotate in place, so the differential and car-like branches of the drive-type input are not exercised by these experiments.
  
 \begin{table}[t]
