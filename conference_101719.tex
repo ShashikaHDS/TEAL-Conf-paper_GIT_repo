@@ -78,21 +78,19 @@ construction robotics, robot inclusivity, accessibility, traversability analysis
 \end{IEEEkeywords}
 
 \section{Introduction}
-The construction sector has long been one of the least automated of the major industries, and robots are now beginning to move from controlled factories onto construction sites. They already take on a wide range of construction tasks, from concrete printing, bricklaying, and welding through material transport and excavation to painting, surveying, and inspection~\cite{Gharbia2020-ml}; one recent review screened 375 studies published between 2023 and 2025 alone~\cite{Xu2026-cr}. Their arrival is driven less by novelty than by necessity, since construction ranks among the least productive industries~\cite{Rathnayake2023-xt}, and moving robots into these tasks also removes workers from hazardous conditions. A large share of these tasks are performed by mobile robots that must travel across the site and position themselves at the work location. As a result, before a robot can transport a load, inspect a structure, or finish a surface, it must first physically reach the area where the work is to be done.
+The construction sector has long been one of the least automated of the major industries, and robots are now beginning to move from controlled factories onto construction sites. They already take on a wide range of construction tasks, from concrete printing, bricklaying, and welding through material transport and excavation to painting, surveying, and inspection~\cite{Gharbia2020-ml,Xu2026-cr}. Their arrival is driven less by novelty than by necessity, since construction ranks among the least productive industries~\cite{Rathnayake2023-xt}, and moving robots into these tasks also removes workers from hazardous conditions. A large share of these tasks are performed by mobile robots that must travel across the site and position themselves at the work location. As a result, before a robot can transport a load, inspect a structure, or finish a surface, it must first physically reach the area where the work is to be done.
 
 Construction sites are unstructured, cluttered, and constantly changing~\cite{Xu2026-cr}, and the barriers reported in the literature are dominated by the physical environment rather than by any shortfall in what the robot can do.  Across surveyed studies, limitation in workspace is the single most cited challenge, reported in around 43\% of the papers that document barriers, ahead of structural integrity and the complexity of coordinating robot movement~\cite{Gharbia2020-ml}. Field assessments of active sites reveal several recurring constraints, among them human density, surface unevenness, accessibility, lighting variation, and dynamic clutter, and these constraints are not equal in weight. Accessibility is foundational among them, because the remaining constraints only bind within regions the robot can already reach, and dedicated assessments are emerging for several of them~\cite{zeng2024riilux,borusu2024rilsu}.
 
 
 
-Reconfigurable and modular platforms tackle constrained spaces by changing their own geometry, splitting or folding so the robot can pass through gaps a fixed body could not~\cite{CONCERT,9817632, prabakaran2017htetro}, although this adds mechanical joints and control complexity. Newer navigation stacks add learned perception, multi-sensor fusion, and online path planners that replan around obstacles as they appear. These methods make a robot move through a site more reliably, but they demand heavy sensing and computation, and they operate only after the robot is already on site. What these responses have in common is that they act on the robot or on its perception rather than on the site itself.
+Reconfigurable and modular platforms tackle constrained spaces by changing their own geometry, splitting or folding to pass through gaps a fixed body could not~\cite{CONCERT,9817632, prabakaran2017htetro}, and newer navigation stacks add learned perception and online replanning. Both act on the robot or its perception rather than on the site itself, demand added mechanism or computation, and operate only after the robot is already on site.
 
 The idea of robot inclusivity, meaning the extent to which an environment admits a given robot, has been raised in earlier work~\cite{robot_inclusivity_2013,buildings14051193}. The methods proposed so far are largely manual, with a person walking the site and judging suitability by eye, and such assessment neither scales across many floors and fleets of different robots nor forecasts the effect of a proposed change. Closer to an automated measure, an inclusivity-style index has been proposed for illumination conditions~\cite{zeng2024riilux}, and a companion index scores floor surface unevenness~\cite{borusu2024rilsu}. Yet neither produces an accessibility score that accounts for the obstructions that most often stop a mobile robot, namely narrow passages, slopes, steps, and limited overhead clearance, and neither returns concrete changes that would improve the site. Automated pipelines built on building information models can turn a known model into a robot-specific grid and estimate coverage for one platform~\cite{chen2024bimcpp}, yet they presume a curated model rather than a single raw scan of a live construction site. Terrain traversability estimation likewise scores where a robot can drive from sensor data~\cite{papadakis2013terrain}, but it serves the online navigation of a robot already deployed rather than a pre-deployment assessment of the site. More broadly, robotics offers mature methods for covering a region that is already known to be navigable~\cite{gabriely2001spanning,choset1998boustrophedon,galceran2013survey} and for exploring unknown space online~\cite{yamauchi1997frontier,zelinsky1993planning}, but no existing method computes, in advance of deployment, how much of a specific site a specific robot can reach, nor identifies the site changes that would increase that reach.
 
 We introduce the Robot Inclusivity Index (RII), a closed-loop framework that works from a single three-dimensional point-cloud walkthrough of a site. From that one scan the framework quantifies how much of the site a specified robot can reach, visualises the reachable and unreachable regions as an accessibility map, and produces a ranked list of physical changes such as relocating stored objects, widening corridors, or adjusting ramps. Each change carries a predicted gain in reachable area that can then be verified on site. Because the traversable map is generated for each robot from the same scan, a single site visit can screen an entire fleet in advance.
 
 The contributions of this paper are fourfold. First, we formulate a traversable-map representation that is aware of the target robot and fuses slab projection with slope and step tolerances. Second, we introduce a reference-footprint protocol that separates the unreachability imposed by the environment from that imposed by the platform. Third, we develop a human-guided relocation mechanism that recomputes the index live as an operator moves candidate obstacles and reports the as-found and optimised scores side by side. Fourth, we validate the framework through a field study at an active construction site.
-
-The rest of the paper is organised as follows. Section~\ref{sec:overview} gives a system overview, Section~\ref{sec:method} develops the robot inclusivity index and its computation, Section~\ref{sec:results} reports the field study, and Section~\ref{sec:conclusion} concludes.
 
 \section{System Overview}
 \label{sec:overview}
@@ -136,7 +134,7 @@ The rest of the paper is organised as follows. Section~\ref{sec:overview} gives 
 \label{fig:pipeline}
 \end{figure}
  
-Fig.~\ref{fig:pipeline} presents an overview of our framework, which turns a single scan of a construction site into a deployment assessment for a specified mobile robot. An audit robot traverses the site once and captures it as a three-dimensional map. The RII algorithm then combines this map with a compact description of a target robot and returns the Robot Inclusivity Index for that robot together with an accessibility map marking where on the site it can and cannot operate.
+Fig.~\ref{fig:pipeline} presents an overview of our framework. An audit robot traverses the site once and captures it as a three-dimensional map, and the RII algorithm combines this map with a compact description of a target robot to return the Robot Inclusivity Index for that robot together with an accessibility map marking where on the site it can and cannot operate.
  
 Because the site capture is independent of any particular platform, the same scan serves every robot under consideration. The framework also goes beyond measurement: it highlights the regions that hold the score down, lets a human operator shape the changes that would raise it, and confirms the outcome with a repeat scan. We detail each stage in Section~\ref{sec:method}.
  
@@ -162,17 +160,9 @@ We capture the site in a single walkthrough by the audit robot, a compact tracke
  
 \subsection{Robot-Specific Traversable Map Generation}
 \label{sec:travmap}
-We convert the point cloud into a 2D occupancy map that is specific to the target robot. The map must be robot-specific because obstacles are relative to capability: a kerb that stops one platform is climbed by another, and a low duct that blocks a tall robot is passed beneath by a short one. A single geometric map would therefore misjudge every robot except the one it was tuned for. The conversion proceeds in five steps.
- 
-\begin{enumerate}
-\item \textbf{Floor anchor.} The floor height $z_{f}$ is estimated as the 10th percentile of the $z$ values of the cloud, which is robust to stray points below the true floor.
-\item \textbf{Z-band slicing.} The cloud is sliced into three bands relative to the floor anchor. Points below $z_{f}+s_{\max}$ form the floor slab and model the terrain the robot drives on. Points between $z_{f}+s_{\max}$ and $z_{f}+H$ form the obstacle slab, since they are too high to climb over and too low to pass beneath. Points above $z_{f}+H$ are discarded because the robot passes below them, which is how limited overhead clearance enters the map.
-\item \textbf{Projection and noise gating.} The obstacle slab is projected onto a horizontal grid with a resolution of 0.05\,m per cell, and a cell is marked occupied only if it contains at least three points, which suppresses sensor noise.
-\item \textbf{Slope and step analysis.} The floor slab is analysed for local gradients and height discontinuities. Cells whose slope exceeds $\theta_{\max}$ or whose upward step exceeds $s_{\max}$ are marked non-traversable, while ramps within tolerance, detected by plane fitting, remain traversable; downward discontinuities are not flagged by this analysis.
-\item \textbf{Multi-floor handling.} When the scan spans several storeys, a histogram of $z$ values with 0.10\,m bins reveals floor candidates as prominent peaks; peaks closer than 0.20\,m are merged, and each detected floor is processed into its own map.
-\end{enumerate}
+We convert the point cloud into a 2D occupancy map that is specific to the target robot. The map must be robot-specific because obstacles are relative to capability: a kerb that stops one platform is climbed by another, and a low duct that blocks a tall robot is passed beneath by a short one. The conversion begins from a floor anchor, with the floor height $z_{f}$ estimated as the 10th percentile of the $z$ values of the cloud, which is robust to stray points below the true floor. The cloud is then sliced into three bands relative to this anchor: points below $z_{f}+s_{\max}$ form the floor slab and model the terrain the robot drives on; points between $z_{f}+s_{\max}$ and $z_{f}+H$ form the obstacle slab, since they are too high to climb over and too low to pass beneath; and points above $z_{f}+H$ are discarded because the robot passes below them, which is how limited overhead clearance enters the map. The obstacle slab is projected onto a horizontal grid with a resolution of 0.05\,m per cell, a cell being marked occupied only if it contains at least three points, which suppresses sensor noise. The floor slab is analysed for local gradients and height discontinuities: cells whose slope exceeds $\theta_{\max}$ or whose upward step exceeds $s_{\max}$ are marked non-traversable, while ramps within tolerance, detected by plane fitting, remain traversable; downward discontinuities are not flagged by this analysis. When the scan spans several storeys, a histogram of $z$ values with 0.10\,m bins reveals floor candidates as prominent peaks, peaks closer than 0.20\,m are merged, and each detected floor is processed into its own map.
 
-Formally, let $c$ range over the cells of the horizontal grid of resolution $\delta = 0.05$\,m, let $n(c)$ count the obstacle-slab points of step 2 whose horizontal coordinates fall in $c$, and let $\theta(c)$ and $h(c)$ denote the local slope and upward step height estimated from the floor slab at $c$. Steps 3 and 4 then combine into a single binary non-traversable map,
+Formally, let $c$ range over the cells of the horizontal grid of resolution $\delta = 0.05$\,m, let $n(c)$ count the obstacle-slab points whose horizontal coordinates fall in $c$, and let $\theta(c)$ and $h(c)$ denote the local slope and upward step height estimated from the floor slab at $c$. The occupancy, slope, and step tests combine into a single binary non-traversable map,
 \begin{equation}
 N(c) = \max\bigl\{\mathbf{1}[n(c) \ge 3],\; \mathbf{1}[\theta(c) > \theta_{\max}],\; \mathbf{1}[h(c) > s_{\max}]\bigr\},
 \label{eq:ntrav}
@@ -186,7 +176,8 @@ The result is a robot-specific obstacle and traversable map, exported as an occu
 The required area is drawn by the user or imported from the site plan.
 % TODO state how the required area and the entry point were fixed in the
 % experiments (e.g. traced before any analysis was run; entry at the area
-% doorway) and that both were identical across robots on the same scan Free space alone is not accessibility, since a pocket of free floor contributes nothing if the robot cannot travel to it, and we therefore measure connected reachability from the robot entry point rather than raw free area. Reachable space is extracted by inflating obstacles with the robot footprint and collecting the free cells connected to the robot entry point, with the rectangular footprint tested at $K$ discrete headings to ensure that a robot fitting through a passage in one orientation is not rejected. The drive type sets the turning behaviour these tests must respect, since a holonomic platform can translate in any direction, a differential platform can rotate in place but advances only along its heading, and a car-like platform requires clearance for its turning arc. We encode these turning constraints through the footprint inflation applied during reachability extraction, which converts manoeuvrability limits into the same occupancy representation as the other spatial parameters. Formally, let $B_{k}(c)$ denote the cells swept by the $L \times W$ footprint rectangle centred at $c$ with heading $\varphi_{k} = (k-1)\pi/K$, enlarged according to the drive type $d$; headings over $[0, \pi)$ suffice because the rectangular footprint is invariant under a half turn, and cells outside the mapped grid count as non-traversable.
+% doorway) and that both were identical across robots on the same scan
+Free space alone is not accessibility, since a pocket of free floor contributes nothing if the robot cannot travel to it, and we therefore measure connected reachability from the robot entry point rather than raw free area. Reachable space is extracted by inflating obstacles with the robot footprint and collecting the free cells connected to the robot entry point, with the rectangular footprint tested at $K$ discrete headings to ensure that a robot fitting through a passage in one orientation is not rejected. The drive type sets the turning behaviour these tests must respect, since a holonomic platform can translate in any direction, a differential platform can rotate in place but advances only along its heading, and a car-like platform requires clearance for its turning arc. We encode these turning constraints through the footprint inflation applied during reachability extraction, which converts manoeuvrability limits into the same occupancy representation as the other spatial parameters. Formally, let $B_{k}(c)$ denote the cells swept by the $L \times W$ footprint rectangle centred at $c$ with heading $\varphi_{k} = (k-1)\pi/K$, enlarged according to the drive type $d$; headings over $[0, \pi)$ suffice because the rectangular footprint is invariant under a half turn, and cells outside the mapped grid count as non-traversable.
 % TODO state the value of K used in the experiments
 A cell is free when the footprint fits there at some heading,
 \begin{equation}
@@ -218,13 +209,14 @@ g_{j} &= \mathrm{RII}\bigl[(1-\Omega_{j})N\bigr] - \mathrm{RII}[N],\\
 \end{split}
 \label{eq:gain}
 \end{equation}
-with the products taken per cell; because removals interact, the individual gains $g_{j}$ need not sum to $\mathrm{RII}^{\ast} - \mathrm{RII}[N]$. The optimised score $\mathrm{RII}^{\ast}$ is reported alongside the as-found score, and the pair bounds the improvement achievable through site preparation alone. Candidate improvements are then ranked by $g_{j}$, producing a prioritised list of actions such as relocating specific obstacles, widening a corridor, lowering a ramp, or adding an access opening. Whether an obstacle can actually be moved is judged by the operator in the relocation stage that follows.
+with the products taken per cell; because removals interact, the individual gains $g_{j}$ need not sum to $\mathrm{RII}^{\ast} - \mathrm{RII}[N]$. The optimised score $\mathrm{RII}^{\ast}$ is reported alongside the as-found score, and the pair bounds the improvement achievable through site preparation alone. Candidate improvements are then ranked by $g_{j}$ into a prioritised list of actions; whether an obstacle can actually be moved is judged by the operator in the relocation stage that follows.
  
 \subsection{Human-Guided Relocation and Closed-Loop Verification}
 \label{sec:relocation}
-The final stage places a human in the loop to turn the ranked list into a workable plan, since an operator knows constraints the algorithm cannot see, such as which obstacles can actually be moved and where materials are allowed to be stored. The interface overlays the detected obstacle regions on the accessibility map. The operator selects an obstacle they know to be movable, such as a pallet or a stack of stored material, and drags it to a proposed location; the traversable map and the index recompute live at interactive rates,
+The final stage places a human in the loop to turn the ranked list into a workable plan, since an operator knows constraints the algorithm cannot see, such as which obstacles can actually be moved and where materials are allowed to be stored. The interface overlays the detected obstacle regions on the accessibility map. The operator selects an obstacle they know to be movable and drags it to a proposed location; the traversable map and the index recompute live at interactive rates,
 % TODO quantify: recompute latency, end-to-end pipeline time per setting,
-% typical cloud size, and the hardware used and the display keeps the baseline score, the current score, and the difference between them visible throughout. The operator iterates until the target level of accessibility is reached, and the resulting arrangement becomes a relocation plan for the site team. Predicted gains remain simulations until the site itself changes. After the physical changes are applied on site, the audit robot repeats the scan and the analysis, and the comparison between the predicted and the measured index closes the loop.
+% typical cloud size, and the hardware used
+and the display keeps the baseline score, the current score, and the difference between them visible throughout. The operator iterates until the target level of accessibility is reached, and the resulting arrangement becomes a relocation plan for the site team. Predicted gains remain simulations until the site itself changes. After the physical changes are applied on site, the audit robot repeats the scan and the analysis, and the comparison between the predicted and the measured index closes the loop.
  
 \subsection{Validation Test Cases}
 \label{sec:testcases}
@@ -312,38 +304,38 @@ Across the five settings we compared the accessibility map predicted for each ro
 
 \begin{figure*}[!t]
 \centering
-\makebox[0.31\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
-\makebox[0.31\textwidth]{\footnotesize Annotated behaviour}\hspace{0.017\textwidth}%
-\makebox[0.31\textwidth]{\footnotesize Disagreement}\\[2pt]
+\makebox[0.275\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
+\makebox[0.275\textwidth]{\footnotesize Annotated behaviour}\hspace{0.017\textwidth}%
+\makebox[0.275\textwidth]{\footnotesize Disagreement}\\[2pt]
 \subfloat[Setting 1]{%
-\includegraphics[width=0.31\textwidth]{figs/setting1_predicted.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting1_annotated.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting1_difference.png}}\\[2pt]
+\includegraphics[width=0.275\textwidth]{figs/setting1_predicted.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting1_annotated.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting1_difference.png}}\\[2pt]
 \subfloat[Setting 2]{%
-\includegraphics[width=0.31\textwidth]{figs/setting2_predicted.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting2_annotated.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting2_difference.png}}\\[2pt]
+\includegraphics[width=0.275\textwidth]{figs/setting2_predicted.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting2_annotated.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting2_difference.png}}\\[2pt]
 \subfloat[Setting 3]{%
-\includegraphics[width=0.31\textwidth]{figs/setting3_predicted.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting3_annotated.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting3_difference.png}}
+\includegraphics[width=0.275\textwidth]{figs/setting3_predicted.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting3_annotated.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting3_difference.png}}
 \caption{Validation of the Movilo predictions in Settings 1 to 3 (rows). Columns: predicted accessibility map, map annotated from the deployment video, and their disagreement. Green marks area the robot can reach, orange marks required area it cannot, and the disagreement column colours every pixel on which the two maps differ in red.}
 \label{fig:heatmaps_movilo}
 \end{figure*}
 
 \begin{figure*}[!t]
 \centering
-\makebox[0.31\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
-\makebox[0.31\textwidth]{\footnotesize Annotated behaviour}\hspace{0.017\textwidth}%
-\makebox[0.31\textwidth]{\footnotesize Disagreement}\\[2pt]
+\makebox[0.275\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
+\makebox[0.275\textwidth]{\footnotesize Annotated behaviour}\hspace{0.017\textwidth}%
+\makebox[0.275\textwidth]{\footnotesize Disagreement}\\[2pt]
 \subfloat[Setting 4]{%
-\includegraphics[width=0.31\textwidth]{figs/setting4_predicted.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting4_annotated.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting4_difference.png}}\\[2pt]
+\includegraphics[width=0.275\textwidth]{figs/setting4_predicted.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting4_annotated.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting4_difference.png}}\\[2pt]
 \subfloat[Setting 5]{%
-\includegraphics[width=0.31\textwidth]{figs/setting5_predicted.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting5_annotated.png}\hspace{0.017\textwidth}%
-\includegraphics[width=0.31\textwidth]{figs/setting5_difference.png}}
+\includegraphics[width=0.275\textwidth]{figs/setting5_predicted.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting5_annotated.png}\hspace{0.017\textwidth}%
+\includegraphics[width=0.275\textwidth]{figs/setting5_difference.png}}
 \caption{Validation of the GO2 predictions in Settings 4 and 5 (rows), with columns and colours as in Fig.~\ref{fig:heatmaps_movilo}.}
 \label{fig:heatmaps_go2}
 \end{figure*}
@@ -358,7 +350,7 @@ We report the label similarity, the fraction of identically labelled pixels over
 
 Table~\ref{tab:similarity} summarises the outcome. The predicted and annotated maps carry the same label on 92.6\% of the union area overall, with per-setting values between 90.2\% and 94.1\%, and wherever both maps commit to a label they agree on 98.7\% of pixels. The gap between the two figures is dominated by a thin band at region boundaries rather than by disagreement about accessibility, visible as the red outlines in the disagreement panels of Figs.~\ref{fig:heatmaps_movilo} and~\ref{fig:heatmaps_go2}. Most of this band is the safety buffer the annotation deliberately draws around obstacles, a property of the protocol rather than a prediction error, and per setting 80--100\% of the pixels labelled only in the annotated map lie within three pixels of the predicted region boundary. Discounting the band raises the overall agreement to 97.9\%, with the three-pixel tolerance sitting at the observed plateau of the similarity-versus-tolerance curve rather than being an arbitrary choice.
 
-Three further measures complete the picture. At the level of staged conditions, 58 of the 60 conducted conditions were predicted correctly, a 96.7\% match rate with a Wilson 95\% confidence interval of 88.6--99.1\%, split 26 of 27 for the Movilo and 32 of 33 for the GO2; both misses involved small objects that the point-cloud noise filtering removes. At the level of the index, the RII computed from the predicted map exceeded the value computed from the annotated map in every setting, by 1.4 to 8.1 percentage points and 4.6 pooled, as listed in Table~\ref{tab:similarity}; part of this offset is definitional, since the annotation counts its safety buffer as unreachable, so these figures bound the index error from above. Finally, because the accessible class dominates every map, we also report chance-corrected agreement: pooled Cohen's kappa is 0.62, a level that class imbalance depresses even when the residual disagreement is confined to the boundary band already discussed, while the accessible-class intersection over union of 95--98\% per setting and the accessible-label precision of 96.4--99.9\% show the labels themselves are recovered reliably. The residual errors are asymmetric, with area wrongly marked accessible totalling 21.5\,m$^2$ across the five settings, eleven times the area wrongly marked unreachable. This asymmetry is acceptable for the intended use: the index is a site-preparation screening tool rather than a safety clearance, responsibility for small objects at deployment time remains with the robot's onboard perception, and the upper-bound reading of the index makes the residual optimism explicit.
+Three further measures complete the picture. At the level of staged conditions, 58 of the 60 conducted conditions were predicted correctly, a 96.7\% match rate with a Wilson 95\% confidence interval of 88.6--99.1\%, split 26 of 27 for the Movilo and 32 of 33 for the GO2; both misses involved small objects that the point-cloud noise filtering removes. At the level of the index, the RII computed from the predicted map exceeded the value computed from the annotated map in every setting, by 1.4 to 8.1 percentage points and 4.6 pooled, as listed in Table~\ref{tab:similarity}; part of this offset is definitional, since the annotation counts its safety buffer as unreachable, so these figures bound the index error from above. Finally, because the accessible class dominates every map, we also report chance-corrected agreement: pooled Cohen's kappa is 0.62, a level depressed by class imbalance even though the residual disagreement is confined to the boundary band, while the accessible-class intersection over union of 95--98\% and accessible-label precision of 96.4--99.9\% show the labels are recovered reliably. The residual errors are asymmetric, with area wrongly marked accessible totalling 21.5\,m$^2$ across the five settings, eleven times the area wrongly marked unreachable. This asymmetry is acceptable for the intended use: the index is a site-preparation screening tool rather than a safety clearance, responsibility for small objects at deployment time remains with the robot's onboard perception, and the upper-bound reading of the index makes the residual optimism explicit.
 
 \begin{table}[t]
 \caption{Per-setting validation results. Label: label similarity over the union of labelled pixels; Colour: agreement where both maps label a pixel; 3\,px: label similarity discounting the annotation boundary band; Cases: conducted conditions predicted correctly; $\Delta$RII: predicted minus ground-truth index in percentage points (pp). In the overall row, the similarity columns are weighted by pixel count, Cases is the total over settings, and $\Delta$RII is the pooled value.}
@@ -380,7 +372,7 @@ Overall & & 92.6 & 98.7 & 97.9 & 58/60 & $+4.6$ \\
 \end{tabular}
 \end{table}
 
-The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the conditions Setting~5 encountered on site were all predicted correctly, with one caveat: the wet floor lies outside the geometric scope of the index, so its accessible marking rests on geometry alone, and the safe traversal is consistent with that marking without slipperiness itself being a property the index assesses. A case-by-case inspection of the disagreement panels against the deployment video further identified fourteen localised route-level discrepancies, regions where the annotated behaviour contradicts the prediction; Section~\ref{sec:discussion} traces them to their mechanisms.
+The comparisons follow a consistent pattern. Obstacles placed at the edge of a route were correctly left accessible, passages narrower than the inflated footprint and blocking partitions were correctly marked unreachable, and the conditions Setting~5 encountered on site were all predicted correctly, with the caveat that slipperiness lies outside the geometric scope of the index, so the wet floor's accessible marking rests on geometry alone. A case-by-case inspection of the disagreement panels against the deployment video further identified fourteen localised route-level discrepancies, regions where the annotated behaviour contradicts the prediction; Section~\ref{sec:discussion} traces them to their mechanisms.
 % TODO confirm whether the two missed test conditions are among the
 % fourteen route-level discrepancies, and state it here
 
@@ -392,7 +384,8 @@ The closed loop of Section~\ref{sec:relocation} was exercised in four further ar
 In each test the audit robot scanned the area, and the framework computed the as-found index and attributed the unreachable regions to blocking obstacles; movable obstacles were then physically relocated, and a repeat scan of the adjusted area measured the realised index. Table~\ref{tab:relocation} reports the results, and Fig.~\ref{fig:beforeafter} shows a representative pair of maps.
 % TODO if the interface-predicted (optimised) indices for R1-R4 were
 % recorded, add them as a Predicted column here and report the
-% predicted-versus-measured gap in the text The as-found indices, between 44.3\% and 78.1\%, confirm that clutter on an active site can deny a robot half of its required workspace, and the adjustments raised every area above 93\%, with gains of 15.6 to 52.1 percentage points and a mean of 37. Where both platforms were assessed on the same scans their indices moved together, the painting robot finishing up to two points above the Movilo, so a single round of site preparation served both robots.
+% predicted-versus-measured gap in the text
+The as-found indices, between 44.3\% and 78.1\%, confirm that clutter on an active site can deny a robot half of its required workspace, and the adjustments raised every area above 93\%, with gains of 15.6 to 52.1 percentage points and a mean of 37. Where both platforms were assessed on the same scans their indices moved together, the painting robot finishing up to two points above the Movilo, so a single round of site preparation served both robots.
  
 \begin{table}[t]
 \caption{Closed-loop adjustment tests: the RII as found and after the physical relocation of movable obstacles, both measured from scans; the gain is in percentage points (pp). R1 and R2 were tested on the first deployment day, R3 and R4 on the second.}
