@@ -318,9 +318,6 @@ Drive type $d$ & Holonomic (omni.) & Legged & Holonomic (omni.) \\
 \subsection{Prediction Validation}
 \label{sec:validation}
 Across the five settings we compared the accessibility map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video; the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:field} (bottom) shows one such staged condition beside the prediction it tests, and Fig.~\ref{fig:heatmaps} shows all five settings, with the predicted map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
-% NOTE absolute per-setting RII values could be added alongside the deltas
-% in Table III if desired
-
 \begin{figure*}[!t]
 \centering
 \makebox[0.25\textwidth]{\footnotesize Predicted}\hspace{0.017\textwidth}%
@@ -360,24 +357,24 @@ We report the label similarity, the fraction of identically labelled pixels over
 
 Table~\ref{tab:similarity} summarises the outcome. The predicted and annotated maps carry the same label on 92.6\% of the union area overall, with per-setting values between 90.2\% and 94.1\%, and wherever both maps commit to a label they agree on 98.7\% of pixels. The gap between the two figures is dominated by a thin band at region boundaries rather than by disagreement about accessibility, visible as the red outlines in the disagreement panels of Fig.~\ref{fig:heatmaps}. Most of this band is the safety buffer the annotation deliberately draws around obstacles, a property of the protocol rather than a prediction error, and per setting 80--100\% of the pixels labelled only in the annotated map lie within three pixels of the predicted region boundary. Discounting the band raises the overall agreement to 97.9\%, with the three-pixel tolerance sitting at the observed plateau of the similarity-versus-tolerance curve rather than being an arbitrary choice.
 
-Three further measures complete the picture. At the level of staged conditions, 58 of the 60 conducted conditions were predicted correctly, a 96.7\% match rate with a Wilson 95\% confidence interval of 88.6--99.1\%, split 26 of 27 for the Movilo and 32 of 33 for the GO2; both misses involved small objects that the point-cloud noise filtering removes. At the level of the index, the RII computed from the predicted map exceeded the value computed from the annotated map in every setting, by 1.4 to 8.1 percentage points and 4.6 pooled, as listed in Table~\ref{tab:similarity}; part of this offset is definitional, since the annotation counts its safety buffer as unreachable, so these figures bound the index error from above. Finally, because the accessible class dominates every map, we also report chance-corrected agreement: pooled Cohen's kappa is 0.62, a level depressed by class imbalance even though the residual disagreement is confined to the boundary band, while the accessible-class intersection over union of 95--98\% and accessible-label precision of 96.4--99.9\% show the labels are recovered reliably. The residual errors are asymmetric, with area wrongly marked accessible totalling 21.5\,m$^2$ across the five settings, eleven times the area wrongly marked unreachable. This asymmetry is acceptable for a site-preparation screening tool, since small objects at deployment time remain the responsibility of onboard perception and the upper-bound reading makes the residual optimism explicit.
+Three further measures complete the picture. At the level of staged conditions, 58 of the 60 conducted conditions were predicted correctly, a 96.7\% match rate with a Wilson 95\% confidence interval of 88.6--99.1\%, split 26 of 27 for the Movilo and 32 of 33 for the GO2; both misses involved small objects that the point-cloud noise filtering removes. At the level of the index, the predicted RII spans 80.9\% to 98.7\% across the settings and exceeded the value computed from the annotated map in every case, by 1.4 to 8.1 percentage points and 4.6 pooled (Table~\ref{tab:similarity}); part of this offset is definitional, since the annotation counts its safety buffer as unreachable, so these figures bound the index error from above. Finally, because the accessible class dominates every map, we also report chance-corrected agreement: pooled Cohen's kappa is 0.62, a level depressed by class imbalance even though the residual disagreement is confined to the boundary band, while the accessible-class intersection over union of 95--98\% and accessible-label precision of 96.4--99.9\% show the labels are recovered reliably. The residual errors are asymmetric, with area wrongly marked accessible totalling 21.5\,m$^2$ across the five settings, eleven times the area wrongly marked unreachable. This asymmetry is acceptable for a site-preparation screening tool, since small objects at deployment time remain the responsibility of onboard perception and the upper-bound reading makes the residual optimism explicit.
 
 \begin{table}[t]
-\caption{Per-setting validation. Label: similarity over the union of labelled pixels; Colour: agreement where both maps label a pixel; 3\,px: similarity discounting the boundary band; Cases: conditions predicted correctly; $\Delta$RII: predicted minus ground-truth index (pp). Overall row: pixel-weighted, cases summed, pooled $\Delta$RII.}
+\caption{Per-setting validation, in percent except Cases. RII: index from the predicted map; Label: similarity over the union of labelled pixels; Colour: agreement where both maps label a pixel; 3\,px: similarity discounting the boundary band; Cases: conditions predicted correctly; $\Delta$RII: predicted minus ground-truth index (pp). Overall row: pixel-weighted, cases summed, pooled $\Delta$RII.}
 \label{tab:similarity}
 \centering
 \footnotesize
-\begin{tabular}{@{}llccccc@{}}
+\begin{tabular}{@{}llcccccc@{}}
 \toprule
-Setting & Robot & Label (\%) & Colour (\%) & 3\,px (\%) & Cases & $\Delta$RII (pp) \\
+Setting & Robot & RII & Label & Colour & 3\,px & Cases & $\Delta$RII \\
 \midrule
-1 & Movilo & 92.0 & 98.8 & 97.2 & 11/11 & $+4.0$ \\
-2 & Movilo & 90.2 & 96.6 & 96.4 & 11/12 & $+8.1$ \\
-3 & Movilo & 94.1 & 99.7 & 97.8 & 4/4 & $+1.4$ \\
-4 & GO2 & 94.1 & 99.8 & 99.7 & 8/9 & $+4.2$ \\
-5 & GO2 & 90.8 & 97.6 & 97.5 & 24/24 & $+7.8$ \\
+1 & Movilo & 80.9 & 92.0 & 98.8 & 97.2 & 11/11 & $+4.0$ \\
+2 & Movilo & 95.1 & 90.2 & 96.6 & 96.4 & 11/12 & $+8.1$ \\
+3 & Movilo & 97.3 & 94.1 & 99.7 & 97.8 & 4/4 & $+1.4$ \\
+4 & GO2 & 98.1 & 94.1 & 99.8 & 99.7 & 8/9 & $+4.2$ \\
+5 & GO2 & 98.7 & 90.8 & 97.6 & 97.5 & 24/24 & $+7.8$ \\
 \midrule
-Overall & & 92.6 & 98.7 & 97.9 & 58/60 & $+4.6$ \\
+Overall & & 94.6 & 92.6 & 98.7 & 97.9 & 58/60 & $+4.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
