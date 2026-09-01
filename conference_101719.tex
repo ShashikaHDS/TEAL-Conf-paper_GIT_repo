@@ -307,9 +307,16 @@ Drive type $d$ & Holonomic (omni.) & Legged & Holonomic (omni.) \\
  
 \subsection{Prediction Validation}
 \label{sec:validation}
-Across the five settings we compared the accessibility map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video; the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Figs.~\ref{fig:heatmaps_movilo} and~\ref{fig:heatmaps_go2} show all five settings, with the predicted map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
+Across the five settings we compared the accessibility map predicted for each robot against the observed behaviour of the physical platform. Every staged test case was attempted by the robot and recorded on video; the executed motion was annotated onto the map, and a prediction counts as correct when a region marked accessible was traversed and a region marked inaccessible could not be entered. Fig.~\ref{fig:staged} shows one such staged condition beside the prediction it tests, and Figs.~\ref{fig:heatmaps_movilo} and~\ref{fig:heatmaps_go2} show all five settings, with the predicted map beside the annotated behaviour of the robot and a third panel marking every pixel on which the two disagree.
 % NOTE absolute per-setting RII values could be added alongside the deltas
 % in Table III if desired
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/staged_condition.png}
+\caption{A staged validation condition in Setting~1: (a) the Movilo at a corridor-width condition staged with wooden rails narrower than its footprint; (b) the corresponding accessibility map, which marks the passage unreachable, with the robot position, movement direction, and starting point annotated. The physical robot could not pass, matching the prediction.}
+\label{fig:staged}
+\end{figure}
 
 \begin{figure*}[!t]
 \centering
