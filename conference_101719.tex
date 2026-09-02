@@ -1,8 +1,7 @@
-% SII 2027 requires A4; for the final submission, prefer the official
-% PaperPlaza LaTeX kit (ieeeconf) and its format checker
-\documentclass[conference,a4paper]{IEEEtran}
+% SII 2027 official PaperPlaza template class (ieeeconf, A4)
+\documentclass[a4paper, 10pt, conference]{ieeeconf}
 \IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\overrideIEEEmargins
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -42,10 +41,6 @@
 \begin{abstract}
 Construction robots can only work where they can physically reach, yet no existing method quantifies in advance how much of a site a given robot can access. This paper introduces the Robot Inclusivity Index, a closed-loop framework that turns a single three-dimensional point-cloud walkthrough of a construction site into a deployment assessment for a mobile robot described by a compact parameter set. From one scan, the framework generates a robot-specific traversable map that fuses footprint, overhead clearance, step, and slope tolerances, measures connected reachability within a required operating area to produce the index and an accessibility map, and ranks candidate physical site changes by their predicted gain in reachable area. A human-guided relocation interface turns the ranking into a site-preparation plan whose effect a repeat scan verifies. We validate the framework at an active construction site across five staged environment settings using an omnidirectional transport robot and a quadruped robot. Predicted accessibility maps matched the maps annotated from deployment video on 92.6\% of the labelled area, rising to 97.9\% once annotation boundary effects are discounted, and 58 of 60 test conditions were predicted correctly. In four further cluttered areas, physical adjustments guided by the framework raised the index from as low as 44\% to above 93\%, measured by repeat scans. Because every assessment derives from the same scan, a single site visit can screen an entire fleet before deployment.
 \end{abstract}
-
-\begin{IEEEkeywords}
-system integration, construction robotics, robot inclusivity, accessibility, traversability analysis, point cloud, mobile robots, field robotics
-\end{IEEEkeywords}
 
 \section{Introduction}
 Robots are moving from controlled factories onto construction sites and already take on tasks from concrete printing, bricklaying, and welding through material transport and excavation to painting, surveying, and inspection~\cite{Gharbia2020-ml,Xu2026-cr}. Their arrival is driven by necessity, since construction ranks among the least productive industries~\cite{Rathnayake2023-xt}, and robots also remove workers from hazardous conditions. A large share of these tasks fall to mobile robots, and before a robot can transport a load, inspect a structure, or finish a surface, it must first physically reach the area where the work is to be done.
